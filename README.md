@@ -1,8 +1,10 @@
 ## Running
 
-Take a look at [k8s/dev.yaml](k8s/dev.yaml). The image will either need to be
-local or hosted elsewhere (not currently public). Change `prometheus-url` to
-point to where it is installed.
+For the defaults, run:
+
+```bash
+helm template chart --name dev | kubectl apply -f -
+```
 
 ## Development
 

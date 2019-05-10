@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "smi-metrics.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "smi-metrics.name" . }}
+    helm.sh/chart: {{ include "smi-metrics.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ include "smi-metrics.name" . }}
+      app.kubernetes.io/instance: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ include "smi-metrics.name" . }}
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      containers:
+        - name: shim
+          image: {{ .Values.image.name }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+
+          command:
+            - /smi-metrics
+            - --config=/config.yml
+
+          ports:
+            - containerPort: 8080
+              name: api
+              protocol: TCP
+            - containerPort: 8081
+              name: admin
+              protocol: TCP
+
+          volumeMounts:
+            - name: config
+              mountPath: /config.yml
+              subPath: config.yml
+            - mountPath: /var/run/smi-metrics
+              name: tls
+              readOnly: true
+
+          {{ if .Values.probes }}
+          livenessProbe:
+            httpGet:
+              path: /status
+              port: 8081
+          readinessProbe:
+            httpGet:
+              path: /status
+              port: 8081
+          {{ end }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "smi-metrics.fullname" . }}
+        - name: tls
+          secret:
+            secretName: {{ include "smi-metrics.fullname" . }}
