@@ -1,0 +1,36 @@
+{{- $cn :=  list (include "smi-metrics.fullname" .) .Release.Namespace "svc" | join "." -}}
+{{- $ca := genCA $cn 365 -}}
+{{- $cert := genSignedCert $cn nil nil 365 $ca -}}
+apiVersion: apiregistration.k8s.io/v1beta1
+kind: APIService
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ include "smi-metrics.name" . }}
+    helm.sh/chart: {{ include "smi-metrics.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  name: v1alpha1.metrics.smi-spec.io
+spec:
+  service:
+    name: {{ include "smi-metrics.fullname" . }}
+    namespace: {{ .Release.Namespace }}
+  caBundle: {{ b64enc $ca.Cert }}
+  group: metrics.smi-spec.io
+  version: v1alpha1
+  insecureSkipTLSVerify: false
+  groupPriorityMinimum: 100
+  versionPriority: 100
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  labels:
+    app.kubernetes.io/name: {{ include "smi-metrics.name" . }}
+    helm.sh/chart: {{ include "smi-metrics.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+  name: {{ include "smi-metrics.fullname" . }}
+type: kubernetes.io/tls
+data:
+  tls.crt: {{ b64enc $cert.Cert }}
+  tls.key: {{ b64enc $cert.Key }}

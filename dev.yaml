@@ -1,0 +1,3 @@
+config:
+  log-level: debug
+  prometheus-url: http://linkerd-prometheus.linkerd.svc.cluster.local:9090

@@ -1,4 +1,5 @@
 FROM golang:1.12-alpine as builder
+ARG NETRC
 
 WORKDIR /src
 
@@ -8,6 +9,7 @@ RUN apk add --no-cache \
 COPY go.mod .
 COPY go.sum .
 
+RUN echo "${NETRC}" > ~/.netrc
 RUN go mod download
 
 COPY . .

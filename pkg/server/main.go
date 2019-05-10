@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
+	metricsAPI "github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/hellofresh/health-go"
@@ -35,11 +36,6 @@ type Server struct {
 	// Used for error messaging in authorizer
 	clientNamesOriginal string
 }
-
-var (
-	apiVersion   = "v1beta1"
-	groupVersion = fmt.Sprintf("metrics.smi-spec.io/%s", apiVersion)
-)
 
 func (s *Server) getDefaultRouter() *chi.Mux {
 	router := chi.NewRouter()
@@ -71,13 +67,13 @@ func (s *Server) adminRouter() *chi.Mux {
 func (s *Server) APIRouter() (*chi.Mux, error) {
 	router := s.getDefaultRouter()
 
-	handler, err := metrics.NewHandler(s.PrometheusURL, groupVersion)
+	handler, err := metrics.NewHandler(s.PrometheusURL, metricsAPI.APIVersion)
 	if err != nil {
 		return nil, err
 	}
 
 	router.Route(
-		fmt.Sprintf("/apis/%s", groupVersion),
+		fmt.Sprintf("/apis/%s", metricsAPI.APIVersion),
 		func(router chi.Router) {
 			router.Use(s.authorizer)
 

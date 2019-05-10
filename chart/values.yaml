@@ -1,0 +1,10 @@
+replicaCount: 1
+
+image:
+  name: thomasr/smi-metrics
+  pullPolicy: IfNotPresent
+
+config:
+  prometheus-url: http://linkerd-prometheus.linkerd.svc.cluster.local:9090
+
+resources: {}
