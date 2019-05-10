@@ -3,7 +3,7 @@
 For the defaults, run:
 
 ```bash
-helm template chart | kubectl apply -f -
+helm template chart --name dev | kubectl apply -f -
 ```
 
 ## Development
