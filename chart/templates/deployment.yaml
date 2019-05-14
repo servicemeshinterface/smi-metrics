@@ -19,6 +19,7 @@ spec:
         app.kubernetes.io/name: {{ include "smi-metrics.name" . }}
         app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
+      serviceAccountName: {{ include "smi-metrics.fullname" . }}
       containers:
         - name: shim
           image: {{ .Values.image.name }}
