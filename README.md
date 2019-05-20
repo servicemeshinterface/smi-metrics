@@ -32,3 +32,7 @@ helm template chart --name dev | kubectl apply -f -
 
 - export prometheus for client-go
 - integrate swagger with apiservice (OpenAPI AggregationController)
+
+## Contributing
+
+Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more information on contributing to the specification.
