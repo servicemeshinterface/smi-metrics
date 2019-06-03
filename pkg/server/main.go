@@ -32,6 +32,9 @@ type Server struct {
 
 	PrometheusURL string
 
+	ResourceQueries map[string]string
+	EdgeQueries     map[string]string
+
 	clientNames map[string]bool
 	// Used for error messaging in authorizer
 	clientNamesOriginal string
@@ -67,7 +70,7 @@ func (s *Server) adminRouter() *chi.Mux {
 func (s *Server) APIRouter() (*chi.Mux, error) {
 	router := s.getDefaultRouter()
 
-	handler, err := metrics.NewHandler(s.PrometheusURL, metricsAPI.APIVersion)
+	handler, err := metrics.NewHandler(s.PrometheusURL, metricsAPI.APIVersion, s.EdgeQueries, s.ResourceQueries)
 	if err != nil {
 		return nil, err
 	}

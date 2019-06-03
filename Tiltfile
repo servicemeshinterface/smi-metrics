@@ -1,4 +1,4 @@
-k8s_yaml(local("helm template chart -f dev.yaml --name dev"))
+k8s_yaml(local("helm template chart -f linkerd.yaml --name dev"))
 watch_file('chart')
 
 docker_build('thomasr/smi-metrics', '.')

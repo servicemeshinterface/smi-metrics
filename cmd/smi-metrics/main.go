@@ -209,11 +209,13 @@ func run(_ *cobra.Command, args []string) {
 	log.Infof("admin listening on %d", viper.GetInt("admin-port"))
 
 	s := server.Server{
-		APIPort:        viper.GetInt("api-port"),
-		AdminPort:      viper.GetInt("admin-port"),
-		TLSCertificate: viper.GetString("tls-cert-file"),
-		TLSPrivateKey:  viper.GetString("tls-private-key"),
-		PrometheusURL:  viper.GetString("prometheus-url"),
+		APIPort:         viper.GetInt("api-port"),
+		AdminPort:       viper.GetInt("admin-port"),
+		TLSCertificate:  viper.GetString("tls-cert-file"),
+		TLSPrivateKey:   viper.GetString("tls-private-key"),
+		PrometheusURL:   viper.GetString("prometheus-url"),
+		ResourceQueries: viper.GetStringMapString("resourceQueries"),
+		EdgeQueries:     viper.GetStringMapString("edgeQueries"),
 	}
 
 	if err := s.Listen(); err != nil {
