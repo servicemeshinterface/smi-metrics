@@ -115,7 +115,7 @@ func (h *Handler) edges(w http.ResponseWriter, r *http.Request) {
 		}, true),
 		details:  details,
 		interval: interval,
-		queries:  h.edgeQueries,
+		queries:  h.queries.EdgeQueries,
 	}
 
 	if err := prometheus.NewClient(r.Context(), h.client, interval).Update(

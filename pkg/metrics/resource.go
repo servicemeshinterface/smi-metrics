@@ -67,7 +67,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 			Namespace: namespace,
 		}, false),
 		interval: interval,
-		queries:  h.resourceQueries,
+		queries:  h.queries.ResourceQueries,
 	}
 
 	if err := prometheus.NewClient(r.Context(), h.client, interval).Update(
@@ -101,7 +101,7 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
 			Namespace: namespace,
 		}, false),
 		interval: interval,
-		queries:  h.resourceQueries,
+		queries:  h.queries.ResourceQueries,
 	}
 
 	if err := prometheus.NewClient(r.Context(), h.client, interval).Update(

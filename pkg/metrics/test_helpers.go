@@ -1,6 +1,8 @@
 package metrics
 
 import (
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
@@ -197,7 +199,12 @@ func (s *Suite) request(
 func (s *Suite) SetupTest() {
 	s.groupVersion = "testing.k8s.io/v1beta1"
 
-	handler, err := NewHandler("http://stub:9090", s.groupVersion, map[string]string{}, map[string]string{})
+	file, err := ioutil.ReadFile("test_queries.yaml")
+
+	var queries Queries
+	err = yaml.Unmarshal(file, &queries)
+
+	handler, err := NewHandler("http://stub:9090", s.groupVersion, queries)
 	s.Require().NoError(err)
 
 	s.client = &mocks.API{}

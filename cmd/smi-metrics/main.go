@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/deislabs/smi-metrics/pkg/metrics"
 	"strings"
 
 	"github.com/fsnotify/fsnotify"
@@ -208,14 +209,18 @@ func run(_ *cobra.Command, args []string) {
 	log.Infof("api listening on %d", viper.GetInt("api-port"))
 	log.Infof("admin listening on %d", viper.GetInt("admin-port"))
 
-	s := server.Server{
-		APIPort:         viper.GetInt("api-port"),
-		AdminPort:       viper.GetInt("admin-port"),
-		TLSCertificate:  viper.GetString("tls-cert-file"),
-		TLSPrivateKey:   viper.GetString("tls-private-key"),
-		PrometheusURL:   viper.GetString("prometheus-url"),
+	queries := metrics.Queries{
 		ResourceQueries: viper.GetStringMapString("resourceQueries"),
 		EdgeQueries:     viper.GetStringMapString("edgeQueries"),
+	}
+
+	s := server.Server{
+		APIPort:        viper.GetInt("api-port"),
+		AdminPort:      viper.GetInt("admin-port"),
+		TLSCertificate: viper.GetString("tls-cert-file"),
+		TLSPrivateKey:  viper.GetString("tls-private-key"),
+		PrometheusURL:  viper.GetString("prometheus-url"),
+		Queries:        queries,
 	}
 
 	if err := s.Listen(); err != nil {
