@@ -1,0 +1,29 @@
+#!/bin/bash
+set -eu
+
+lintversion=1.15.0
+
+cd "$(pwd -P)"
+
+bindir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+rootdir="$( cd $bindir/.. && pwd )"
+
+cd "$rootdir"
+
+os=linux
+exe=
+if [ "$(uname -s)" = "Darwin" ]; then
+  os=darwin
+elif [ "$(uname -o)" = "Msys" ]; then
+  os=windows
+  exe=.exe
+fi
+
+lintbin="${rootdir}/.golangci-lint-${lintversion}${exe}"
+
+if [ ! -f "$lintbin" ]; then
+  curl -sfL https://raw.githubusercontent.com/golangci/golangci-lint/v$lintversion/install.sh | sh -s -- -b . v$lintversion
+  mv ./golangci-lint${exe} $lintbin
+fi
+
+$lintbin run "$@"
