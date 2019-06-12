@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/deislabs/smi-metrics/pkg/metrics"
 	"strings"
+
+	"github.com/deislabs/smi-metrics/pkg/metrics"
 
 	"github.com/fsnotify/fsnotify"
 	log "github.com/sirupsen/logrus"

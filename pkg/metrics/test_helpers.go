@@ -203,9 +203,11 @@ func (s *Suite) SetupTest() {
 	s.groupVersion = "testing.k8s.io/v1beta1"
 
 	file, err := ioutil.ReadFile("test_queries.yaml")
+	s.Require().NoError(err)
 
 	var queries Queries
 	err = yaml.Unmarshal(file, &queries)
+	s.Require().NoError(err)
 
 	handler, err := NewHandler("http://stub:9090", s.groupVersion, queries)
 	s.Require().NoError(err)
