@@ -3,6 +3,7 @@ linters:
   disable:
     - maligned
     - prealloc
+    - unparam
     - gochecknoglobals
 
   skip-dirs:
