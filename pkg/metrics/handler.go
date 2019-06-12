@@ -14,19 +14,22 @@ import (
 type Handler struct {
 	client promv1.API
 
+	queries Queries
+
 	render *render.Render
 }
 
 // NewHandler returns a handler that has been initialized to defaults.
-func NewHandler(url, groupVersion string) (*Handler, error) {
+func NewHandler(url, groupVersion string, queries Queries) (*Handler, error) {
 	promClient, err := api.NewClient(api.Config{Address: url})
 	if err != nil {
 		return nil, err
 	}
 
 	return &Handler{
-		client: promv1.NewAPI(promClient),
-		render: render.New(),
+		client:  promv1.NewAPI(promClient),
+		render:  render.New(),
+		queries: queries,
 	}, nil
 }
 

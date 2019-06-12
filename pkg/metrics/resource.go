@@ -16,6 +16,7 @@ import (
 type resourceLookup struct {
 	Item     *metrics.TrafficMetricsList
 	interval *metrics.Interval
+	queries  map[string]string
 }
 
 func (r *resourceLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
@@ -36,7 +37,7 @@ func (r *resourceLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
 
 func (r *resourceLookup) Queries() []*prometheus.Query {
 	queries := []*prometheus.Query{}
-	for name, tmpl := range resourceQueries {
+	for name, tmpl := range r.queries {
 		queries = append(queries, &prometheus.Query{
 			Name:     name,
 			Template: tmpl,
@@ -66,6 +67,7 @@ func (h *Handler) list(w http.ResponseWriter, r *http.Request) {
 			Namespace: namespace,
 		}, false),
 		interval: interval,
+		queries:  h.queries.ResourceQueries,
 	}
 
 	if err := prometheus.NewClient(r.Context(), h.client, interval).Update(
@@ -99,6 +101,7 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
 			Namespace: namespace,
 		}, false),
 		interval: interval,
+		queries:  h.queries.ResourceQueries,
 	}
 
 	if err := prometheus.NewClient(r.Context(), h.client, interval).Update(

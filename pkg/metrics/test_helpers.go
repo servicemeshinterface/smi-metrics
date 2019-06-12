@@ -1,11 +1,14 @@
 package metrics
 
 import (
+	"io/ioutil"
 	"math/rand"
 	"net/http"
 	"net/http/httptest"
 	"path"
 	"time"
+
+	yaml "gopkg.in/yaml.v2"
 
 	"github.com/deislabs/smi-metrics/pkg/metrics/mocks"
 	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
@@ -52,6 +55,7 @@ type testData struct {
 	namespace string
 }
 
+// Suite is a testing suite with a mock client and a handler instance
 type Suite struct {
 	suite.Suite
 
@@ -194,10 +198,18 @@ func (s *Suite) request(
 	return rr
 }
 
+// SetupTest sets up the tests suite with a handler and a mock client
 func (s *Suite) SetupTest() {
 	s.groupVersion = "testing.k8s.io/v1beta1"
 
-	handler, err := NewHandler("http://stub:9090", s.groupVersion)
+	file, err := ioutil.ReadFile("test_queries.yaml")
+	s.Require().NoError(err)
+
+	var queries Queries
+	err = yaml.Unmarshal(file, &queries)
+	s.Require().NoError(err)
+
+	handler, err := NewHandler("http://stub:9090", s.groupVersion, queries)
 	s.Require().NoError(err)
 
 	s.client = &mocks.API{}
