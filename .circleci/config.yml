@@ -17,7 +17,6 @@ jobs:
           name: Running unit tests
           command: |
             make lint test
-            make test
       - save_cache:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
