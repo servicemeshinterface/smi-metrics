@@ -1,12 +1,12 @@
 # SMI Metrics API
 
-The `smi-metrics` api follows the format of the official [Metrics API](https://github.com/kubernetes-incubator/metrics-server) being built on top of kubernetes to get metrics about pods and nodes but here the metrics will be about service i.e their Golden Metrics i.e P99, P55, success_count, etc based on a specific workload.
+The `smi-metrics` api follows the format of the official [Metrics API](https://github.com/kubernetes-incubator/metrics-server) being built on top of kubernetes to get metrics about pods and nodes but here the metrics are oriented towards the inbound and outbound requests i.e their Golden Metrics like p99_latency, P55_latency, success_count, etc for a particular workload.
 
 ## Working
 
-The SMI metrics api is a Kubernetes [APIService](https://kubernetes.io/docs/tasks/access-kubernetes-api/setup-extension-api-server/) as seen [here](https://github.com/deislabs/smi-metrics/blob/94dec57fdabc680cc60e4961db1707609f6b81ed/chart/templates/apiservice.yaml#L5), which is a way of extending the Kubernetes API. 
+The SMI metrics api is a Kubernetes [APIService](https://kubernetes.io/docs/tasks/access-kubernetes-api/setup-extension-api-server/) more info [here](https://github.com/deislabs/smi-metrics/blob/94dec57fdabc680cc60e4961db1707609f6b81ed/chart/templates/apiservice.yaml#L5), which is a way of extending the Kubernetes API.
 
-We will perform installation of the SMI Metrics API w.r.t linkerd. So, Once linkerd is installed in the cluster as per the instructions [here](https://linkerd.io/2/getting-started/), This API can be installed by running the following command 
+We will perform installation of the SMI Metrics API w.r.t linkerd. Make sure linkerd is installed and is running as per the instructions [here](https://linkerd.io/2/getting-started/), This API can be installed by running the following command
 ```
 helm template chart -f dev.yaml -f linkerd.yaml --name dev
 ```
@@ -23,12 +23,16 @@ pods                                           metrics.smi-spec.io            tr
 statefulsets                                   metrics.smi-spec.io            true         TrafficMetrics
 ```
 
-Now that the SMI APIService is ready, We can start querying it for metrics.
-To Access the Kubernetes API, let's first create a proxy so as to access from the localhost.
+This means that, the APIService can be queried regarding the above mentioned resource types.
+
+Now that the SMI APIService is installing, metric queries can be done through the kubernetes API.
+To Access the Kubernetes API, we can use the `proxy` command present in `kubectl`
 ```
 kubectl proxy --port=8087 &
 ```
-Once this is done, we can start querying the API Service for SMI metrics regarding our workloads. As Linkerd also attaches proxies to the linkerd control-plane components itself, we should be able to query their metrics. Be sure to access the linkerd dashboard by using `linkerd dashboard`, as the metrics are configured to only return the last 30s metrics by default.
+Now the Kubernetes API can be accessed at port `8087`. As Linkerd also attaches proxies to the linkerd control-plane components, we should be able to query their metrics too. 
+
+Be sure to access the linkerd dashboard by using the command `linkerd dashboard` before querying, as the metrics are configured to only return the last 30s by default.
 
 ```
 curl http://localhost:8087/apis/metrics.smi-spec.io/v1alpha1/namespaces/linkerd/deployments/linkerd-web | jq
@@ -82,7 +86,7 @@ Output:
   ]
 }
 ```
-As we can see, we can get the golden metrics of a particular service by querying the API with path `/apis/metrics.smi-spec.io/v1alpha1/namespaces/{Namespace}/{Kind}/{ResourceName}`
+As we can see, the golden metrics of a particular resource can be retrieved by querying the API with a path format `/apis/metrics.smi-spec.io/v1alpha1/namespaces/{Namespace}/{Kind}/{ResourceName}`
 
 Queries for golden metrics on edges i.e paths associated with a particular resource, for example linkerd-controller can also be done by adding `/edges` to the path.
 ```
@@ -206,4 +210,4 @@ Output:
 }
 ```
 
-The API and the response format will be similar for other service meshes like istio and consul connect once the support is added which is being worked on right now.
+The support for istio and consul connect is being worked up on right now and the API and responses will have the same structure unless there are no changes to the spec.
