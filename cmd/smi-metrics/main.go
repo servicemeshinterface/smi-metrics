@@ -51,7 +51,10 @@ func bindFlag(f *pflag.Flag) error {
 	return nil
 }
 
+adsf
+
 func main() {
+	fmt.Println("foobar")
 	if err := cmd.Execute(); err != nil {
 		log.Fatalf("unable to execute: %s", err)
 	}
