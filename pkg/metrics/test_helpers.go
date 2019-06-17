@@ -202,7 +202,7 @@ func (s *Suite) request(
 func (s *Suite) SetupTest() {
 	s.groupVersion = "testing.k8s.io/v1beta1"
 
-	file, err := ioutil.ReadFile("test_queries.yaml")
+	file, err := ioutil.ReadFile("test_queris.yaml")
 	s.Require().NoError(err)
 
 	var queries Queries
