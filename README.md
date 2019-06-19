@@ -1,6 +1,6 @@
 # SMI Metrics API
 
-This repository is an implementation of the [Traffic Metrics Spec](https://github.com/deislabs/smi-spec/blob/master/traffic-metrics.md) which follows the format of the official [Metrics API](https://github.com/kubernetes-incubator/metrics-server) being built on top of kubernetes to get metrics about pods and nodes. 
+This repository is an implementation of the [Traffic Metrics Spec](https://github.com/deislabs/smi-spec/blob/master/traffic-metrics.md) which follows the format of the official [Metrics API](https://github.com/kubernetes-incubator/metrics-server) being built on top of kubernetes to get metrics about pods and nodes.
 Here, the metrics are about the inbound and outbound requests i.e their Golden Metrics like p99_latency, p55_latency, success_count, etc for a particular workload.
 
 ## Installation
