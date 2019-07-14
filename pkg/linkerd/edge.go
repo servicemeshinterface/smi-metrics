@@ -1,22 +1,21 @@
-package metrics
+package linkerd
 
 import (
 	"fmt"
-	"net/http"
 	"strings"
 
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
-	"github.com/go-chi/chi"
-	"github.com/prometheus/common/model"
-	v1 "k8s.io/api/core/v1"
+	"github.com/deislabs/smi-metrics/pkg/mesh"
 
 	"github.com/deislabs/smi-metrics/pkg/prometheus"
+	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	"github.com/prometheus/common/model"
+	v1 "k8s.io/api/core/v1"
 )
 
 type edgeLookup struct {
 	Item     *metrics.TrafficMetricsList
 	interval *metrics.Interval
-	details  *resourceDetails
+	details  mesh.ResourceDetails
 	queries  map[string]string
 }
 
@@ -57,7 +56,7 @@ func (e *edgeLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
 		}
 	}
 
-	obj := e.Item.Get(listKey(
+	obj := e.Item.Get(mesh.ListKey(
 		e.Item.Resource.Kind,
 		e.Item.Resource.Name,
 		e.Item.Resource.Namespace,
@@ -95,36 +94,4 @@ func (e *edgeLookup) Queries() []*prometheus.Query {
 	}
 
 	return queries
-}
-
-func (h *Handler) edges(w http.ResponseWriter, r *http.Request) {
-	interval := r.Context().Value(intervalKey).(*metrics.Interval)
-	details := r.Context().Value(detailsKey).(*resourceDetails)
-	kind := details.Kind
-
-	namespace := chi.URLParam(r, "namespace")
-	name := chi.URLParam(r, "name")
-
-	lookup := &edgeLookup{
-		Item: metrics.NewTrafficMetricsList(&v1.ObjectReference{
-			Kind: kind,
-			Name: name,
-			// If a namespace isn't defined, it'll be the empty string which fits
-			// with the struct's idea of "empty"
-			Namespace: namespace,
-		}, true),
-		details:  details,
-		interval: interval,
-		queries:  h.queries.EdgeQueries,
-	}
-
-	if err := prometheus.NewClient(r.Context(), h.client, interval).Update(
-		lookup); err != nil {
-		h.jsonResponse(w, http.StatusInternalServerError, errorResponse{
-			Error: "unable to lookup metrics",
-		})
-		return
-	}
-
-	h.jsonResponse(w, http.StatusOK, lookup.Item)
 }

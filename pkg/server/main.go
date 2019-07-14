@@ -19,6 +19,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/deislabs/smi-metrics/pkg/cluster"
+	"github.com/deislabs/smi-metrics/pkg/mesh"
 	"github.com/deislabs/smi-metrics/pkg/metrics"
 )
 
@@ -30,9 +31,7 @@ type Server struct {
 	TLSCertificate string
 	TLSPrivateKey  string
 
-	PrometheusURL string
-
-	Queries metrics.Queries
+	Mesh mesh.Mesh
 
 	clientNames map[string]bool
 	// Used for error messaging in authorizer
@@ -70,7 +69,7 @@ func (s *Server) adminRouter() *chi.Mux {
 func (s *Server) APIRouter() (*chi.Mux, error) {
 	router := s.getDefaultRouter()
 
-	handler, err := metrics.NewHandler(s.PrometheusURL, metricsAPI.APIVersion, s.Queries)
+	handler, err := metrics.NewHandler(s.Mesh)
 	if err != nil {
 		return nil, err
 	}

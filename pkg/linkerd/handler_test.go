@@ -1,4 +1,4 @@
-package metrics
+package linkerd
 
 import (
 	"encoding/json"

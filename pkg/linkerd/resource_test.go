@@ -1,4 +1,4 @@
-package metrics
+package linkerd
 
 import (
 	"encoding/json"
@@ -7,6 +7,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/deislabs/smi-metrics/pkg/mesh"
 	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/suite"
@@ -104,7 +105,7 @@ func (s *ResourceTestSuite) TestListByKind() {
 func (s *ResourceTestSuite) TestGetNamespace() {
 	assert := s.Assert()
 
-	details, ok := getResourceDetails("namespaces")
+	details, ok := mesh.GetResourceDetails("namespaces")
 	assert.True(ok, "namespaces need to be supported")
 
 	sample := testData{
