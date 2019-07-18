@@ -5,13 +5,6 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
-type contextKey string
-
-var (
-	IntervalKey = contextKey("metrics-interval")
-	DetailsKey  = contextKey("metrics-details")
-)
-
 type ResourceDetails struct {
 	Kind       string
 	Namespaced bool

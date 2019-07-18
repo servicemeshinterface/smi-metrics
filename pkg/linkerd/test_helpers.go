@@ -8,8 +8,6 @@ import (
 	"path"
 	"time"
 
-	"github.com/deislabs/smi-metrics/pkg/mesh"
-
 	"gopkg.in/yaml.v2"
 
 	"github.com/deislabs/smi-metrics/pkg/linkerd/mocks"
@@ -208,7 +206,7 @@ func (s *Suite) SetupTest() {
 	file, err := ioutil.ReadFile("test_queries.yaml")
 	s.Require().NoError(err)
 
-	var queries mesh.Queries
+	var queries Queries
 	err = yaml.Unmarshal(file, &queries)
 	s.Require().NoError(err)
 
@@ -218,7 +216,7 @@ func (s *Suite) SetupTest() {
 		queries.EdgeQueries,
 	}
 
-	linkerdMesh, err := NewLinkerd(config)
+	linkerdMesh, err := NewLinkerdProvider(config)
 	s.Require().NoError(err)
 
 	handler, err := metrics.NewHandler(linkerdMesh)

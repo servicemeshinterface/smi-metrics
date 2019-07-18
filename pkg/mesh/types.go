@@ -12,18 +12,19 @@ type Mesh interface {
 	GetSupportedResources(ctx context.Context) (*metav1.APIResourceList, error)
 	// Return metrics for a resource or for the type if name is empty
 	GetResourceMetrics(ctx context.Context,
-		name, namespace, kind string,
+		query Query,
 		interval *metrics.Interval) (*metrics.TrafficMetricsList, error)
 	// Return the Edge Metrics for a resource
 	GetEdgeMetrics(ctx context.Context,
-		name, namespace, kind string,
+		query Query,
 		interval *metrics.Interval,
 		details *ResourceDetails) (*metrics.TrafficMetricsList, error)
 }
 
-type Queries struct {
-	ResourceQueries map[string]string `yaml:"resourceQueries"`
-	EdgeQueries     map[string]string `yaml:"edgeQueries"`
+type Query struct {
+	Name      string
+	Namespace string
+	Kind      string
 }
 
 type ErrorResponse struct {

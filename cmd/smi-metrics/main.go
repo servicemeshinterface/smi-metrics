@@ -219,7 +219,7 @@ func run(_ *cobra.Command, args []string) {
 			log.Fatalf("Unable to unmarshal config into struct")
 		}
 
-		meshInstance, err = linkerd.NewLinkerd(config)
+		meshInstance, err = linkerd.NewLinkerdProvider(config)
 		if err != nil {
 			log.Fatal("Couldn't create a Linkerd instance", err)
 		}

@@ -22,8 +22,13 @@ type Config struct {
 	EdgeQueries     map[string]string `yaml:"edgeQueries"`
 }
 
+type Queries struct {
+	ResourceQueries map[string]string `yaml:"resourceQueries"`
+	EdgeQueries     map[string]string `yaml:"edgeQueries"`
+}
+
 type Linkerd struct {
-	queries          mesh.Queries
+	queries          Queries
 	prometheusClient promv1.API
 }
 
@@ -45,17 +50,17 @@ func (l *Linkerd) GetSupportedResources(ctx context.Context) (*metav1.APIResourc
 }
 
 func (l *Linkerd) GetEdgeMetrics(ctx context.Context,
-	name, namespace, kind string,
+	query mesh.Query,
 	interval *metrics.Interval,
 	details *mesh.ResourceDetails) (*metrics.TrafficMetricsList, error) {
 
 	lookup := &edgeLookup{
 		Item: metrics.NewTrafficMetricsList(&v1.ObjectReference{
-			Kind: kind,
-			Name: name,
+			Kind: query.Kind,
+			Name: query.Name,
 			// If a namespace isn't defined, it'll be the empty string which fits
 			// with the struct's idea of "empty"
-			Namespace: namespace,
+			Namespace: query.Namespace,
 		}, true),
 		details:  *details,
 		interval: interval,
@@ -70,25 +75,12 @@ func (l *Linkerd) GetEdgeMetrics(ctx context.Context,
 }
 
 func (l *Linkerd) GetResourceMetrics(ctx context.Context,
-	name, namespace, kind string,
+	query mesh.Query,
 	interval *metrics.Interval) (*metrics.TrafficMetricsList, error) {
 
-	var obj *v1.ObjectReference
-
-	if name != "" {
-		obj = &v1.ObjectReference{
-			Kind: kind,
-			Name: name,
-			// If a namespace isn't defined, it'll be the empty string which fits
-			// with the struct's idea of "empty"
-			Namespace: namespace,
-		}
-	} else {
-		obj = &v1.ObjectReference{
-			Kind: kind,
-			// If a namespace isn't defined, it'll be the empty string which fits
-			// with the struct's idea of "empty"
-			Namespace: namespace}
+	obj := &v1.ObjectReference{Kind: query.Kind, Namespace: query.Namespace}
+	if query.Name != "" {
+		obj.Name = query.Name
 	}
 
 	// Get is somewhat of a special case as *most* handlers just return a list.
@@ -109,7 +101,7 @@ func (l *Linkerd) GetResourceMetrics(ctx context.Context,
 	return lookup.Item, nil
 }
 
-func NewLinkerd(config Config) (*Linkerd, error) {
+func NewLinkerdProvider(config Config) (*Linkerd, error) {
 
 	// Creating a Prometheus Client
 	promClient, err := api.NewClient(api.Config{Address: config.PrometheusURL})
@@ -117,7 +109,7 @@ func NewLinkerd(config Config) (*Linkerd, error) {
 		return nil, err
 	}
 
-	queries := mesh.Queries{
+	queries := Queries{
 		ResourceQueries: config.ResourceQueries,
 		EdgeQueries:     config.EdgeQueries,
 	}
