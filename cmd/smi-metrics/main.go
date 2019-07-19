@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/deislabs/smi-metrics/pkg/metrics"
-
+	"github.com/deislabs/smi-metrics/pkg/linkerd"
+	"github.com/deislabs/smi-metrics/pkg/mesh"
 	"github.com/fsnotify/fsnotify"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 	"k8s.io/klog"
 
 	"github.com/deislabs/smi-metrics/pkg/server"
@@ -210,9 +210,25 @@ func run(_ *cobra.Command, args []string) {
 	log.Infof("api listening on %d", viper.GetInt("api-port"))
 	log.Infof("admin listening on %d", viper.GetInt("admin-port"))
 
-	queries := metrics.Queries{
-		ResourceQueries: viper.GetStringMapString("resourceQueries"),
-		EdgeQueries:     viper.GetStringMapString("edgeQueries"),
+	var meshInstance mesh.Mesh
+	var err error
+	log.Info("Mesh Config", viper.GetString("mesh"))
+
+	switch provider := viper.GetString("mesh"); provider {
+	case "linkerd":
+		var config linkerd.Config
+		err = viper.UnmarshalKey("linkerd", &config)
+		if err != nil {
+			log.Fatalf("Unable to unmarshal config into struct")
+		}
+
+		meshInstance, err = linkerd.NewLinkerdProvider(config)
+		if err != nil {
+			log.Fatal("Couldn't create a Linkerd instance", err)
+		}
+	default:
+		log.Fatalf("Unable to recognize the mesh type")
+
 	}
 
 	s := server.Server{
@@ -220,8 +236,7 @@ func run(_ *cobra.Command, args []string) {
 		AdminPort:      viper.GetInt("admin-port"),
 		TLSCertificate: viper.GetString("tls-cert-file"),
 		TLSPrivateKey:  viper.GetString("tls-private-key"),
-		PrometheusURL:  viper.GetString("prometheus-url"),
-		Queries:        queries,
+		Mesh:           meshInstance,
 	}
 
 	if err := s.Listen(); err != nil {

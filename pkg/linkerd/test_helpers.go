@@ -1,4 +1,4 @@
-package metrics
+package linkerd
 
 import (
 	"io/ioutil"
@@ -8,10 +8,11 @@ import (
 	"path"
 	"time"
 
-	yaml "gopkg.in/yaml.v2"
+	"gopkg.in/yaml.v2"
 
-	"github.com/deislabs/smi-metrics/pkg/metrics/mocks"
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	"github.com/deislabs/smi-metrics/pkg/linkerd/mocks"
+	"github.com/deislabs/smi-metrics/pkg/metrics"
+	smimetrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -59,7 +60,7 @@ type testData struct {
 type Suite struct {
 	suite.Suite
 
-	handler *Handler
+	handler *metrics.Handler
 	client  *mocks.API
 
 	groupVersion string
@@ -86,12 +87,12 @@ func (a *apiTest) MatchQueryParam() func(string) bool {
 func (a *apiTest) MockQuery(
 	kind string,
 	labels []model.Metric,
-	num int) (float64, *metrics.Interval) {
+	num int) (float64, *smimetrics.Interval) {
 	result := model.Vector{}
 
 	window := 30 * time.Second
 	val := rand.Float64()
-	interval := &metrics.Interval{
+	interval := &smimetrics.Interval{
 		Timestamp: metav1.NewTime(time.Now()),
 		Window:    metav1.Duration{Duration: window},
 	}
@@ -116,19 +117,19 @@ func (a *apiTest) MockQuery(
 func (s *Suite) validateTrafficMetrics(
 	kind string,
 	val float64,
-	interval *metrics.Interval,
+	interval *smimetrics.Interval,
 	sample testData,
-	result *metrics.TrafficMetrics) {
+	result *smimetrics.TrafficMetrics) {
 
 	assert := s.Assert()
 	require := s.Require()
 
 	// TypeMeta
-	assert.Equal(metrics.APIVersion, result.TypeMeta.APIVersion)
+	assert.Equal(smimetrics.APIVersion, result.TypeMeta.APIVersion)
 	assert.Equal("TrafficMetrics", result.TypeMeta.Kind)
 
 	// ObjectMeta
-	r, ok := metrics.AvailableKinds[result.Resource.Kind]
+	r, ok := smimetrics.AvailableKinds[result.Resource.Kind]
 	require.Truef(ok, "%s should be a valid kind", result.Resource.Kind)
 
 	if r.Namespaced {
@@ -209,11 +210,20 @@ func (s *Suite) SetupTest() {
 	err = yaml.Unmarshal(file, &queries)
 	s.Require().NoError(err)
 
-	handler, err := NewHandler("http://stub:9090", s.groupVersion, queries)
+	config := Config{
+		"http://stub:9090",
+		queries.ResourceQueries,
+		queries.EdgeQueries,
+	}
+
+	linkerdMesh, err := NewLinkerdProvider(config)
+	s.Require().NoError(err)
+
+	handler, err := metrics.NewHandler(linkerdMesh)
 	s.Require().NoError(err)
 
 	s.client = &mocks.API{}
-	handler.client = s.client
 
+	handler.Mesh.(*Linkerd).prometheusClient = s.client
 	s.handler = handler
 }
