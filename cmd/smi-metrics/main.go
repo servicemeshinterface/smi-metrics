@@ -212,7 +212,10 @@ func run(_ *cobra.Command, args []string) {
 
 	var meshInstance mesh.Mesh
 	var err error
-	if viper.Get("linkerd") != nil {
+	log.Info("Mesh Config", viper.GetString("mesh"))
+
+	switch provider := viper.GetString("mesh"); provider {
+	case "linkerd":
 		var config linkerd.Config
 		err = viper.UnmarshalKey("linkerd", &config)
 		if err != nil {
@@ -223,8 +226,9 @@ func run(_ *cobra.Command, args []string) {
 		if err != nil {
 			log.Fatal("Couldn't create a Linkerd instance", err)
 		}
-	} else {
+	default:
 		log.Fatalf("Unable to recognize the mesh type")
+
 	}
 
 	s := server.Server{
