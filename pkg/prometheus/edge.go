@@ -1,4 +1,4 @@
-package linkerd
+package prometheus
 
 import (
 	"fmt"
@@ -6,20 +6,19 @@ import (
 
 	"github.com/deislabs/smi-metrics/pkg/mesh"
 
-	"github.com/deislabs/smi-metrics/pkg/prometheus"
 	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	"github.com/prometheus/common/model"
 	v1 "k8s.io/api/core/v1"
 )
 
-type edgeLookup struct {
-	Item     *metrics.TrafficMetricsList
-	interval *metrics.Interval
-	details  mesh.ResourceDetails
-	queries  map[string]string
+type EdgeLookup struct {
+	Item        *metrics.TrafficMetricsList
+	Interval    *metrics.Interval
+	Details     mesh.ResourceDetails
+	PromQueries map[string]string
 }
 
-func (e *edgeLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
+func (e *EdgeLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
 	kind := strings.ToLower(e.Item.Resource.Kind)
 	src := model.LabelName(kind)
 	dst := model.LabelName(fmt.Sprintf("dst_%s", kind))
@@ -37,7 +36,7 @@ func (e *edgeLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
 			},
 		}
 
-		if e.details.Namespaced {
+		if e.Details.Namespaced {
 			edge.Resource.Namespace = string(
 				labels[model.LabelName("dst_namespace")])
 		}
@@ -50,7 +49,7 @@ func (e *edgeLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
 			},
 		}
 
-		if e.details.Namespaced {
+		if e.Details.Namespaced {
 			edge.Resource.Namespace = string(
 				labels[model.LabelName("namespace")])
 		}
@@ -61,16 +60,16 @@ func (e *edgeLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
 		e.Item.Resource.Name,
 		e.Item.Resource.Namespace,
 	), edge.Resource)
-	obj.Interval = e.interval
+	obj.Interval = e.Interval
 	obj.Edge = edge
 
 	return obj
 }
 
-func (e *edgeLookup) Queries() []*prometheus.Query {
-	queries := []*prometheus.Query{}
-	for name, tmpl := range e.queries {
-		queries = append(queries, &prometheus.Query{
+func (e *EdgeLookup) Queries() []*Query {
+	queries := []*Query{}
+	for name, tmpl := range e.PromQueries {
+		queries = append(queries, &Query{
 			Name:     name,
 			Template: tmpl,
 			Values: map[string]interface{}{
@@ -81,8 +80,8 @@ func (e *edgeLookup) Queries() []*prometheus.Query {
 		})
 	}
 
-	for name, tmpl := range e.queries {
-		queries = append(queries, &prometheus.Query{
+	for name, tmpl := range e.PromQueries {
+		queries = append(queries, &Query{
 			Name:     name,
 			Template: tmpl,
 			Values: map[string]interface{}{
