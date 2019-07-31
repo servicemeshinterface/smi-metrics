@@ -1,0 +1,146 @@
+config:
+  log-level: debug
+  mesh: istio
+  istio:
+    prometheusUrl: http://prometheus.istio-system.svc.cluster.local:9090
+    resourceQueries:
+      p99_response_latency : |-
+        histogram_quantile(
+                          0.99,
+                          sum(
+                            irate(
+                              istio_request_duration_seconds_bucket{
+                              destination_owner=~"{{ printf "kubernetes://apis/.+/namespaces/%s/%ss/%s" (default .namespace) (default ".+" (lower .kind)) (default ".+" .name) }}",
+                              }[{{.window}}]
+                            )
+                          ) by (
+                            destination_owner,
+                            le
+                          )
+                        )
+      p90_response_latency : |-
+        histogram_quantile(
+                          0.90,
+                          sum(
+                            irate(
+                              istio_request_duration_seconds_bucket{
+                              destination_owner=~"{{ printf "kubernetes://apis/.*/namespaces/%s/%ss/%s" (default .namespace) (default ".+" (lower .kind)) (default ".+" .name) }}",
+                              }[{{.window}}]
+                            )
+                          ) by (
+                            destination_owner,
+                            le
+                          )
+                        )
+      p50_response_latency : |-
+        histogram_quantile(
+                          0.50,
+                          sum(
+                            irate(
+                              istio_request_duration_seconds_bucket{
+                              destination_owner=~"{{ printf "kubernetes://apis/.+/namespaces/%s/%ss/%s" (default .namespace) (default ".+" (lower .kind)) (default ".+" .name) }}",
+                              }[{{.window}}]
+                            )
+                          ) by (
+                            destination_owner,
+                            le
+                          )
+                        )
+      success_count : |-
+        sum(
+                  increase(
+                    istio_requests_total{
+                      response_code="200",
+                      destination_owner=~"{{ printf "kubernetes://apis/.+/namespaces/%s/%ss/%s" (default .namespace) (default ".+" (lower .kind)) (default ".+" .name) }}",
+                    }[{{.window}}]
+                  )
+                ) by (
+                  destination_owner
+                )
+      failure_count : |-
+        sum(
+                  increase(
+                    istio_requests_total{
+                      response_code!="200",
+                      destination_owner=~"{{ printf "kubernetes://apis/.+/namespaces/%s/%ss/%s" (default .namespace) (default ".+" (lower .kind)) (default ".+" .name) }}",
+                    }[{{.window}}]
+                  )
+                ) by (
+                  destination_owner
+                )
+    edgeQueries:
+      p99_response_latency : |-
+        histogram_quantile(
+                          0.99,
+                          sum(
+                            irate(
+                              response_latency_ms_bucket{
+                              destination_owner=~"{{default ".+" printf "kubernetes://apis/.+/namespaces/%s/%s/%s" .namespace .kind .toName}}",
+                              source_owner=~"{{default ".+" printf "kubernetes://apis/.+/namespaces/%s/%s/%s" .namespace .kind .fromName}}",
+                              }[{{.window}}]
+                            )
+                          ) by (
+                            destination_owner,
+                            source_owner,
+                            le
+                          )
+                        )
+      p90_response_latency : |-
+        histogram_quantile(
+                          0.90,
+                          sum(
+                            irate(
+                              response_latency_ms_bucket{
+                              destination_owner=~"{{default ".+" printf "kubernetes://apis/.+/namespaces/%s/%s/%s" .namespace .kind .toName}}",
+                              source_owner=~"{{default ".+" printf "kubernetes://apis/.+/namespaces/%s/%s/%s" .namespace .kind .fromName}}",
+                              }[{{.window}}]
+                            )
+                          ) by (
+                            destination_owner,
+                            source_owner,
+                            le
+                          )
+                        )
+      p50_response_latency : |-
+        histogram_quantile(
+                          0.50,
+                          sum(
+                            irate(
+                              response_latency_ms_bucket{
+                              destination_owner=~"{{default ".+" printf "kubernetes://apis/.+/namespaces/%s/%s/%s" .namespace .kind .toName}}",
+                              source_owner=~"{{default ".+" printf "kubernetes://apis/.+/namespaces/%s/%s/%s" .namespace .kind .fromName}}",
+                              }[{{.window}}]
+                            )
+                          ) by (
+                            destination_owner,
+                            source_owner,
+                            le
+                          )
+                        )
+      success_count : |-
+        sum(
+                  increase(
+                    istio_requests_total{
+                      response_code="200",
+                      destination_owner=~"{{default ".+" printf "kubernetes://apis/.+/namespaces/%s/%s/%s" .namespace .kind .name}}",
+                      source_owner=~"{{default ".+" printf "kubernetes://apis/.+/namespaces/%s/%s/%s" .namespace .kind .fromName}}",
+                    }[{{.window}}]
+                  )
+                ) by (
+                  destination_owner,
+                  source_owner,
+                )
+      failure_count : |-
+        sum(
+                  increase(
+                    istio_requests_total{
+                      response_code!="200",
+                      destination_owner=~"{{default ".+" printf "kubernetes://apis/.+/namespaces/%s/%s/%s" .namespace .kind .name}}",
+                      source_owner=~"{{default ".+" printf "kubernetes://apis/.+/namespaces/%s/%s/%s" .namespace .kind .fromName}}",
+                    }[{{.window}}]
+                  )
+                ) by (
+                  destination_owner,
+                  source_owner,
+                )
+  

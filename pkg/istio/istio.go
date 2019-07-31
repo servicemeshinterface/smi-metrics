@@ -1,4 +1,4 @@
-package linkerd
+package istio
 
 import (
 	"context"
@@ -27,12 +27,13 @@ type Queries struct {
 	EdgeQueries     map[string]string `yaml:"edgeQueries"`
 }
 
-type Linkerd struct {
+type Istio struct {
 	queries          Queries
 	prometheusClient promv1.API
 }
 
-func (l *Linkerd) GetSupportedResources(ctx context.Context) (*metav1.APIResourceList, error) {
+func (l *Istio) GetSupportedResources(ctx context.Context) (*metav1.APIResourceList, error) {
+
 	lst := &metav1.APIResourceList{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "APIResourceList",
@@ -49,7 +50,7 @@ func (l *Linkerd) GetSupportedResources(ctx context.Context) (*metav1.APIResourc
 	return lst, nil
 }
 
-func (l *Linkerd) GetEdgeMetrics(ctx context.Context,
+func (l *Istio) GetEdgeMetrics(ctx context.Context,
 	query mesh.Query,
 	interval *metrics.Interval,
 	details *mesh.ResourceDetails) (*metrics.TrafficMetricsList, error) {
@@ -74,7 +75,7 @@ func (l *Linkerd) GetEdgeMetrics(ctx context.Context,
 	return lookup.Item, nil
 }
 
-func (l *Linkerd) GetResourceMetrics(ctx context.Context,
+func (l *Istio) GetResourceMetrics(ctx context.Context,
 	query mesh.Query,
 	interval *metrics.Interval) (*metrics.TrafficMetricsList, error) {
 
@@ -101,7 +102,7 @@ func (l *Linkerd) GetResourceMetrics(ctx context.Context,
 	return lookup.Item, nil
 }
 
-func NewLinkerdProvider(config Config) (*Linkerd, error) {
+func NewIstioProvider(config Config) (*Istio, error) {
 
 	// Creating a Prometheus Client
 	promClient, err := api.NewClient(api.Config{Address: config.PrometheusURL})
@@ -114,7 +115,7 @@ func NewLinkerdProvider(config Config) (*Linkerd, error) {
 		EdgeQueries:     config.EdgeQueries,
 	}
 
-	return &Linkerd{
+	return &Istio{
 		queries:          queries,
 		prometheusClient: promv1.NewAPI(promClient),
 	}, nil
