@@ -17,14 +17,14 @@ type resourceLookup struct {
 }
 
 func (r *resourceLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
-	dest_owner := labels["destination_owner"]
+	destOwner := labels["destination_owner"]
 
 	// Example Value "kubernetes://apis/apps/v1/namespaces/emojivoto/deployments/voting"
-	values := strings.Split(string(dest_owner), "/")
+	values := strings.Split(string(destOwner), "/")
 	obj := r.Item.Get(mesh.ListKey(
 		r.Item.Resource.Kind,
-		string(values[len(values)-1]),
-		string(values[len(values)-3]),
+		values[len(values)-1],
+		values[len(values)-3],
 	), nil)
 	obj.Interval = r.interval
 	obj.Edge = &metrics.Edge{

@@ -3,8 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/deislabs/smi-metrics/pkg/istio"
 	"strings"
+
+	"github.com/deislabs/smi-metrics/pkg/istio"
 
 	"github.com/deislabs/smi-metrics/pkg/linkerd"
 	"github.com/deislabs/smi-metrics/pkg/mesh"
