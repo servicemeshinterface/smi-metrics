@@ -17,21 +17,35 @@ type resourceLookup struct {
 }
 
 func (r *resourceLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
-	destOwner := labels["destination_owner"]
+	destOwner, ok := labels["destination_owner"]
 
-	// Example Value "kubernetes://apis/apps/v1/namespaces/emojivoto/deployments/voting"
-	values := strings.Split(string(destOwner), "/")
-	obj := r.Item.Get(mesh.ListKey(
-		r.Item.Resource.Kind,
-		values[len(values)-1],
-		values[len(values)-3],
-	), nil)
-	obj.Interval = r.interval
-	obj.Edge = &metrics.Edge{
-		Direction: metrics.From,
+	if ok {
+		// Example Value "kubernetes://apis/apps/v1/namespaces/emojivoto/deployments/voting"
+		values := strings.Split(string(destOwner), "/")
+		obj := r.Item.Get(mesh.ListKey(
+			r.Item.Resource.Kind,
+			values[len(values)-1],
+			values[len(values)-3],
+		), nil)
+		obj.Interval = r.interval
+		obj.Edge = &metrics.Edge{
+			Direction: metrics.From,
+		}
+		return obj
+	} else {
+
+		//Namespace Query
+		obj := r.Item.Get(mesh.ListKey(
+			r.Item.Resource.Kind,
+			r.Item.Resource.Name,
+			"",
+		), nil)
+		obj.Interval = r.interval
+		obj.Edge = &metrics.Edge{
+			Direction: metrics.From,
+		}
+		return obj
 	}
-
-	return obj
 }
 
 func (r *resourceLookup) Queries() []*prometheus.Query {

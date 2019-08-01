@@ -17,9 +17,9 @@ import (
 )
 
 type Config struct {
-	PrometheusURL   string            `yaml:"prometheusUrl"`
-	ResourceQueries map[string]string `yaml:"resourceQueries"`
-	EdgeQueries     map[string]string `yaml:"edgeQueries"`
+	PrometheusURL    string  `yaml:"prometheusUrl"`
+	NamespaceQueries Queries `yaml:"namespaceQueries"`
+	WorkloadQueries  Queries `yaml:"workloadQueries"`
 }
 
 type Queries struct {
@@ -28,7 +28,8 @@ type Queries struct {
 }
 
 type Istio struct {
-	queries          Queries
+	NamespaceQueries Queries `yaml:"namespaceQueries"`
+	WorkloadQueries  Queries `yaml:"workloadQueries"`
 	prometheusClient promv1.API
 }
 
@@ -55,6 +56,14 @@ func (l *Istio) GetEdgeMetrics(ctx context.Context,
 	interval *metrics.Interval,
 	details *mesh.ResourceDetails) (*metrics.TrafficMetricsList, error) {
 
+	var queries map[string]string
+	if query.Kind == "namespaces" {
+		log.Info("NAMESPACE QUERYYYY")
+		queries = l.NamespaceQueries.EdgeQueries
+	} else {
+		queries = l.WorkloadQueries.EdgeQueries
+	}
+
 	lookup := &edgeLookup{
 		Item: metrics.NewTrafficMetricsList(&v1.ObjectReference{
 			Kind: query.Kind,
@@ -65,7 +74,7 @@ func (l *Istio) GetEdgeMetrics(ctx context.Context,
 		}, true),
 		details:  *details,
 		interval: interval,
-		queries:  l.queries.EdgeQueries,
+		queries:  queries,
 	}
 
 	if err := prometheus.NewClient(ctx, l.prometheusClient, interval).Update(
@@ -84,13 +93,20 @@ func (l *Istio) GetResourceMetrics(ctx context.Context,
 		obj.Name = query.Name
 	}
 
+	var queries map[string]string
+	log.Info("KIND:", query.Kind)
+	if query.Kind == "Namespace" {
+		queries = l.NamespaceQueries.ResourceQueries
+	} else {
+		queries = l.WorkloadQueries.ResourceQueries
+	}
 	// Get is somewhat of a special case as *most* handlers just return a list.
 	// Create a list with a fully specified object reference and then just
 	// return a single element to keep the code as similar as possible.
 	lookup := &resourceLookup{
 		Item:     metrics.NewTrafficMetricsList(obj, false),
 		interval: interval,
-		queries:  l.queries.ResourceQueries,
+		queries:  queries,
 	}
 
 	if err := prometheus.NewClient(ctx, l.prometheusClient, interval).Update(
@@ -110,13 +126,9 @@ func NewIstioProvider(config Config) (*Istio, error) {
 		return nil, err
 	}
 
-	queries := Queries{
-		ResourceQueries: config.ResourceQueries,
-		EdgeQueries:     config.EdgeQueries,
-	}
-
 	return &Istio{
-		queries:          queries,
+		NamespaceQueries: config.NamespaceQueries,
+		WorkloadQueries:  config.WorkloadQueries,
 		prometheusClient: promv1.NewAPI(promClient),
 	}, nil
 }
