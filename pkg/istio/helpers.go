@@ -9,6 +9,15 @@ import (
 	"github.com/prometheus/common/model"
 )
 
+var (
+	sourceOwner          = model.LabelName("source_owner")
+	destinationOwner     = model.LabelName("destination_owner")
+	sourceNamespace      = model.LabelName("source_workload_namespace")
+	destinationNamespace = model.LabelName("destination_workload_namespace")
+	sourcePod            = model.LabelName("source_uid")
+	destinationPod       = model.LabelName("destination_uid")
+)
+
 type ResultType int
 
 const (
@@ -22,13 +31,6 @@ type Result struct {
 	Namespace string
 	Kind      string
 }
-
-var sourceOwner = model.LabelName("source_owner")
-var destinationOwner = model.LabelName("destination_owner")
-var sourceNamespace = model.LabelName("source_workload_namespace")
-var destinationNamespace = model.LabelName("destination_workload_namespace")
-var sourcePod = model.LabelName("source_uid")
-var destinationPod = model.LabelName("destination_uid")
 
 func GetType(labels model.Metric) (ResultType, error) {
 	metric := labels.String()
