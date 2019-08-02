@@ -20,6 +20,7 @@ import (
 type Config struct {
 	PrometheusURL    string  `yaml:"prometheusUrl"`
 	NamespaceQueries Queries `yaml:"namespaceQueries"`
+	PodQueries       Queries `yaml:"podQueries"`
 	WorkloadQueries  Queries `yaml:"workloadQueries"`
 }
 
@@ -31,6 +32,7 @@ type Queries struct {
 type Istio struct {
 	NamespaceQueries Queries `yaml:"namespaceQueries"`
 	WorkloadQueries  Queries `yaml:"workloadQueries"`
+	PodQueries       Queries `yaml:"podQueries"`
 	prometheusClient promv1.API
 }
 
@@ -60,6 +62,8 @@ func (l *Istio) GetEdgeMetrics(ctx context.Context,
 	var queries map[string]string
 	if query.Kind == "Namespace" {
 		queries = l.NamespaceQueries.EdgeQueries
+	} else if query.Kind == "Pod" {
+		queries = l.PodQueries.EdgeQueries
 	} else {
 		queries = l.WorkloadQueries.EdgeQueries
 	}
@@ -97,6 +101,8 @@ func (l *Istio) GetResourceMetrics(ctx context.Context,
 	var queries map[string]string
 	if query.Kind == "Namespace" {
 		queries = l.NamespaceQueries.ResourceQueries
+	} else if query.Kind == "Pod" {
+		queries = l.PodQueries.ResourceQueries
 	} else {
 		queries = l.WorkloadQueries.ResourceQueries
 	}
@@ -129,6 +135,7 @@ func NewIstioProvider(config Config) (*Istio, error) {
 	return &Istio{
 		NamespaceQueries: config.NamespaceQueries,
 		WorkloadQueries:  config.WorkloadQueries,
+		PodQueries:       config.PodQueries,
 		prometheusClient: promv1.NewAPI(promClient),
 	}, nil
 }

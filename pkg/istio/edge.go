@@ -27,7 +27,9 @@ func (e *edgeLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
 		log.Error(err)
 		return nil
 	}
-
+	log.Info("Source Name:", src.Name)
+	log.Info("RESOURCE NAME:", e.Item.Resource.Name)
+	log.Info("Destination Name:", dst.Name)
 	if src.Name == e.Item.Resource.Name {
 		edge = &metrics.Edge{
 			Direction: metrics.To,
