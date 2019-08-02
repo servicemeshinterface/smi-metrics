@@ -1,9 +1,8 @@
 package istio
 
 import (
-	"strings"
-
 	"github.com/deislabs/smi-metrics/pkg/mesh"
+	"github.com/prometheus/common/log"
 
 	"github.com/deislabs/smi-metrics/pkg/prometheus"
 	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
@@ -18,25 +17,23 @@ type resourceLookup struct {
 
 func (r *resourceLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
 
-	var namespace, name string
-	if destOwner, ok := labels["destination_owner"]; ok {
-		// Workload Query
-		// Example Value "kubernetes://apis/apps/v1/namespaces/emojivoto/deployments/voting"
-		values := strings.Split(string(destOwner), "/")
-		name = values[len(values)-1]
-		namespace = values[len(values)-3]
-
+	var result *result
+	src, dst, err := NewResult(labels)
+	if err != nil {
+		log.Error(err)
+		return nil
+	}
+	if src == nil {
+		result = dst
 	} else {
-		//Namespace Query
-		name = r.Item.Resource.Name
-		namespace = r.Item.Resource.Namespace
+		result = src
 	}
 
 	// Traffic Metrics Object
 	obj := r.Item.Get(mesh.ListKey(
-		r.Item.Resource.Kind,
-		name,
-		namespace,
+		result.Kind,
+		result.Name,
+		result.Namespace,
 	), nil)
 	obj.Interval = r.interval
 	obj.Edge = &metrics.Edge{

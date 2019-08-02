@@ -1,11 +1,9 @@
 package istio
 
 import (
-	"fmt"
-	"strings"
+	"github.com/prometheus/common/log"
 
 	"github.com/deislabs/smi-metrics/pkg/mesh"
-
 	"github.com/deislabs/smi-metrics/pkg/prometheus"
 	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	"github.com/prometheus/common/model"
@@ -20,39 +18,33 @@ type edgeLookup struct {
 }
 
 func (e *edgeLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
-	kind := strings.ToLower(e.Item.Resource.Kind)
-	src := model.LabelName(kind)
-	dst := model.LabelName(fmt.Sprintf("dst_%s", kind))
 
 	// TODO: test for result labels to have *all* requirements and throw error
 	// otherwise (throw in Client.Update)
 	var edge *metrics.Edge
+	src, dst, err := NewResult(labels)
+	if err != nil {
+		log.Error(err)
+		return nil
+	}
 
-	if string(labels[src]) == e.Item.Resource.Name {
+	if src.Name == e.Item.Resource.Name {
 		edge = &metrics.Edge{
 			Direction: metrics.To,
 			Resource: &v1.ObjectReference{
-				Kind: e.Item.Resource.Kind,
-				Name: string(labels[dst]),
+				Kind:      dst.Kind,
+				Namespace: dst.Namespace,
+				Name:      dst.Name,
 			},
 		}
-
-		if e.details.Namespaced {
-			edge.Resource.Namespace = string(
-				labels[model.LabelName("dst_namespace")])
-		}
-	} else {
+	} else if dst.Name == e.Item.Resource.Name {
 		edge = &metrics.Edge{
 			Direction: metrics.From,
 			Resource: &v1.ObjectReference{
-				Kind: e.Item.Resource.Kind,
-				Name: string(labels[src]),
+				Kind:      src.Kind,
+				Namespace: src.Namespace,
+				Name:      src.Name,
 			},
-		}
-
-		if e.details.Namespaced {
-			edge.Resource.Namespace = string(
-				labels[model.LabelName("namespace")])
 		}
 	}
 

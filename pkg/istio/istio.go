@@ -2,6 +2,7 @@ package istio
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/deislabs/smi-metrics/pkg/mesh"
 
@@ -57,13 +58,13 @@ func (l *Istio) GetEdgeMetrics(ctx context.Context,
 	details *mesh.ResourceDetails) (*metrics.TrafficMetricsList, error) {
 
 	var queries map[string]string
-	if query.Kind == "namespaces" {
-		log.Info("NAMESPACE QUERYYYY")
+	if query.Kind == "Namespace" {
 		queries = l.NamespaceQueries.EdgeQueries
 	} else {
 		queries = l.WorkloadQueries.EdgeQueries
 	}
 
+	log.Info(fmt.Sprintf("Query for %s/%s/%s", query.Namespace, query.Kind, query.Name))
 	lookup := &edgeLookup{
 		Item: metrics.NewTrafficMetricsList(&v1.ObjectReference{
 			Kind: query.Kind,
@@ -94,7 +95,6 @@ func (l *Istio) GetResourceMetrics(ctx context.Context,
 	}
 
 	var queries map[string]string
-	log.Info("KIND:", query.Kind)
 	if query.Kind == "Namespace" {
 		queries = l.NamespaceQueries.ResourceQueries
 	} else {
