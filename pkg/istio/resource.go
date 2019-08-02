@@ -17,7 +17,7 @@ type resourceLookup struct {
 
 func (r *resourceLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
 
-	var result *result
+	var result *Result
 	src, dst, err := NewResult(labels)
 	if err != nil {
 		log.Error(err)

@@ -5,6 +5,10 @@ linters:
     - prealloc
     - unparam
     - gochecknoglobals
+    - dupl
+    - interfacer
+    - goconst
+    - gocyclo
 
   skip-dirs:
     # ignore the system libraries

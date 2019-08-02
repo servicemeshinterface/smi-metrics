@@ -60,11 +60,13 @@ func (l *Istio) GetEdgeMetrics(ctx context.Context,
 	details *mesh.ResourceDetails) (*metrics.TrafficMetricsList, error) {
 
 	var queries map[string]string
-	if query.Kind == "Namespace" {
+
+	switch query.Kind {
+	case "Namespace":
 		queries = l.NamespaceQueries.EdgeQueries
-	} else if query.Kind == "Pod" {
+	case "Pod":
 		queries = l.PodQueries.EdgeQueries
-	} else {
+	default:
 		queries = l.WorkloadQueries.EdgeQueries
 	}
 
@@ -99,11 +101,12 @@ func (l *Istio) GetResourceMetrics(ctx context.Context,
 	}
 
 	var queries map[string]string
-	if query.Kind == "Namespace" {
+	switch query.Kind {
+	case "Namespace":
 		queries = l.NamespaceQueries.ResourceQueries
-	} else if query.Kind == "Pod" {
+	case "Pod":
 		queries = l.PodQueries.ResourceQueries
-	} else {
+	default:
 		queries = l.WorkloadQueries.ResourceQueries
 	}
 	// Get is somewhat of a special case as *most* handlers just return a list.
