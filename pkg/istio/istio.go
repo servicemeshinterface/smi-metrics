@@ -30,9 +30,7 @@ type Queries struct {
 }
 
 type Istio struct {
-	NamespaceQueries Queries `yaml:"namespaceQueries"`
-	WorkloadQueries  Queries `yaml:"workloadQueries"`
-	PodQueries       Queries `yaml:"podQueries"`
+	config           Config
 	prometheusClient promv1.API
 }
 
@@ -63,11 +61,11 @@ func (l *Istio) GetEdgeMetrics(ctx context.Context,
 
 	switch query.Kind {
 	case "Namespace":
-		queries = l.NamespaceQueries.EdgeQueries
+		queries = l.config.NamespaceQueries.EdgeQueries
 	case "Pod":
-		queries = l.PodQueries.EdgeQueries
+		queries = l.config.PodQueries.EdgeQueries
 	default:
-		queries = l.WorkloadQueries.EdgeQueries
+		queries = l.config.WorkloadQueries.EdgeQueries
 	}
 
 	log.Info(fmt.Sprintf("Query for %s/%s/%s", query.Namespace, query.Kind, query.Name))
@@ -103,11 +101,11 @@ func (l *Istio) GetResourceMetrics(ctx context.Context,
 	var queries map[string]string
 	switch query.Kind {
 	case "Namespace":
-		queries = l.NamespaceQueries.ResourceQueries
+		queries = l.config.NamespaceQueries.ResourceQueries
 	case "Pod":
-		queries = l.PodQueries.ResourceQueries
+		queries = l.config.PodQueries.ResourceQueries
 	default:
-		queries = l.WorkloadQueries.ResourceQueries
+		queries = l.config.WorkloadQueries.ResourceQueries
 	}
 	// Get is somewhat of a special case as *most* handlers just return a list.
 	// Create a list with a fully specified object reference and then just
@@ -136,9 +134,7 @@ func NewIstioProvider(config Config) (*Istio, error) {
 	}
 
 	return &Istio{
-		NamespaceQueries: config.NamespaceQueries,
-		WorkloadQueries:  config.WorkloadQueries,
-		PodQueries:       config.PodQueries,
+		config:           config,
 		prometheusClient: promv1.NewAPI(promClient),
 	}, nil
 }
