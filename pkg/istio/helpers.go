@@ -2,7 +2,10 @@ package istio
 
 import (
 	"errors"
+	"fmt"
 	"strings"
+
+	v1 "k8s.io/api/core/v1"
 
 	"github.com/prometheus/common/log"
 
@@ -18,21 +21,21 @@ var (
 	destinationPod       = model.LabelName("destination_uid")
 )
 
-type ResultType int
-
 const (
-	Pod       ResultType = 1
-	Workload  ResultType = 2
-	Namespace ResultType = 3
+	Pod       string = "Pod"
+	Workload  string = "Workload"
+	Namespace string = "Namespace"
 )
 
-type Result struct {
-	Name      string
-	Namespace string
-	Kind      string
+func newObjectReference(name, namespace, kind string) *v1.ObjectReference {
+	return &v1.ObjectReference{
+		Name:      name,
+		Namespace: namespace,
+		Kind:      kind,
+	}
 }
 
-func GetType(labels model.Metric) (ResultType, error) {
+func GetType(labels fmt.Stringer) (string, error) {
 	metric := labels.String()
 	if strings.Contains(metric, string(sourcePod)) || strings.Contains(metric, string(destinationPod)) {
 		return Pod, nil
@@ -43,87 +46,108 @@ func GetType(labels model.Metric) (ResultType, error) {
 	if strings.Contains(metric, string(sourceNamespace)) || strings.Contains(metric, string(destinationNamespace)) {
 		return Namespace, nil
 	}
-	return -1, errors.New("couldn't find type of result")
+	return "", errors.New("couldn't find type of result")
 }
 
 // Return (src, dst) from the result labels
-func NewResult(labels model.Metric) (source, destination *Result, err error) {
-	resultType, err := GetType(labels)
+func GetObjectsReference(labels model.Metric) (source, destination *v1.ObjectReference, err error) {
+	result, err := GetType(labels)
 	if err != nil {
 		log.Error(err)
 		return nil, nil, err
 	}
-	var src, dst *Result
+	var src, dst *v1.ObjectReference
 
-	switch resultType {
+	switch result {
 	case Pod:
-		// Resource is Pod
-		if val, ok := labels[sourcePod]; ok {
-			// Present at Source
-			values := strings.Split(string(val), "//")
-			subVal := strings.Split(values[1], ".")
-			src = &Result{
-				Name:      subVal[0],
-				Namespace: subVal[1],
-				Kind:      "Pod",
-			}
-		}
-
-		if val, ok := labels[destinationPod]; ok {
-			// Present at Destination
-			values := strings.Split(string(val), "//")
-			subVal := strings.Split(values[1], ".")
-			dst = &Result{
-				Name:      subVal[0],
-				Namespace: subVal[1],
-				Kind:      "Pod",
-			}
-		}
+		// Resource is a Pod
+		src, dst, err = objectReferencesFromPodLabels(labels)
 	case Namespace:
-		// It is Namespace
-		if val, ok := labels[sourceNamespace]; ok {
-			// Present at Source
-			src = &Result{
-				Name:      string(val),
-				Namespace: "",
-				Kind:      "Namespace",
-			}
-		}
-
-		if val, ok := labels[destinationNamespace]; ok {
-			// Present at  Destination
-			dst = &Result{
-				Name:      string(val),
-				Namespace: "",
-				Kind:      "Namespace",
-			}
-		}
+		// Resource is a Namespace
+		src, dst, err = objectReferencesFromNamespaceLabels(labels)
 	case Workload:
-		if val, ok := labels[sourceOwner]; ok && !strings.Contains(string(val), ".+") {
-			// Present at Source
-			values := strings.Split(string(val), "/")[6:]
-			if len(values) < 3 {
-				return nil, nil, errors.New("wrong Pattern of Workload")
-			}
-			src = &Result{
-				Name:      values[2],
-				Namespace: values[0],
-				Kind:      values[1],
-			}
-		}
+		// Resource is a Workload i.e Deployment, Daemonset, Job, etc
+		src, dst, err = objectReferencesFromWorkloadLabels(labels)
+	}
 
-		if val, ok := labels[destinationOwner]; ok && !strings.Contains(string(val), ".+") {
-			// Present at  Destination
-			values := strings.Split(string(val), "/")[6:]
-			if len(values) < 3 {
-				return nil, nil, errors.New("wrong Pattern of Workload")
-			}
-			dst = &Result{
-				Name:      values[2],
-				Namespace: values[0],
-				Kind:      values[1],
-			}
-		}
+	if err != nil {
+		return nil, nil, err
 	}
 	return src, dst, nil
+}
+
+func objectReferencesFromNamespaceLabels(labels model.Metric) (source, destination *v1.ObjectReference, err error) {
+	var src, dst *v1.ObjectReference
+	if val, ok := labels[sourceNamespace]; ok {
+		// Present at Source
+		src = newObjectReference(string(val), "", Namespace)
+	}
+
+	if val, ok := labels[destinationNamespace]; ok {
+		// Present at  Destination
+		dst = newObjectReference(string(val), "", Namespace)
+	}
+
+	return src, dst, nil
+}
+
+func objectReferencesFromWorkloadLabels(labels model.Metric) (source, destination *v1.ObjectReference, err error) {
+	var src, dst *v1.ObjectReference
+	if val, ok := labels[sourceOwner]; ok && !strings.Contains(string(val), ".+") {
+		// Present at Source
+		src, err = objectReferenceFromWorkloadLabel(val)
+		if err != nil {
+			return src, dst, err
+		}
+	}
+
+	if val, ok := labels[destinationOwner]; ok && !strings.Contains(string(val), ".+") {
+		// Present at  Destination
+		dst, err = objectReferenceFromWorkloadLabel(val)
+		if err != nil {
+			return src, dst, err
+		}
+	}
+
+	return src, dst, nil
+}
+
+func objectReferencesFromPodLabels(labels model.Metric) (source, destination *v1.ObjectReference, err error) {
+	var src, dst *v1.ObjectReference
+	if val, ok := labels[sourcePod]; ok {
+		// Present at Source
+		src, err = ObjectReferenceFromPodLabel(val)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	if val, ok := labels[destinationPod]; ok {
+		// Present at Destination
+		src, err = ObjectReferenceFromPodLabel(val)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	return src, dst, nil
+}
+
+func ObjectReferenceFromPodLabel(value model.LabelValue) (*v1.ObjectReference, error) {
+	values := strings.Split(string(value), "//")
+	subVal := strings.Split(values[1], ".")
+	if len(subVal) < 2 {
+		return nil, errors.New("wrong pattern of Pod label value")
+	}
+
+	return newObjectReference(subVal[0], subVal[1], Pod), nil
+}
+
+func objectReferenceFromWorkloadLabel(value model.LabelValue) (*v1.ObjectReference, error) {
+	values := strings.Split(string(value), "/")[6:]
+	if len(values) < 3 {
+		return nil, errors.New("wrong pattern of Workload label value")
+	}
+
+	return newObjectReference(values[2], values[0], values[1]), nil
 }

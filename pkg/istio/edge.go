@@ -22,7 +22,7 @@ func (e *edgeLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
 	// TODO: test for result labels to have *all* requirements and throw error
 	// otherwise (throw in Client.Update)
 	var edge *metrics.Edge
-	src, dst, err := NewResult(labels)
+	src, dst, err := GetObjectsReference(labels)
 	if err != nil {
 		log.Error(err)
 		return nil

@@ -100,9 +100,9 @@ func (l *Istio) GetResourceMetrics(ctx context.Context,
 
 	var queries map[string]string
 	switch query.Kind {
-	case "Namespace":
+	case Namespace:
 		queries = l.config.NamespaceQueries.ResourceQueries
-	case "Pod":
+	case Pod:
 		queries = l.config.PodQueries.ResourceQueries
 	default:
 		queries = l.config.WorkloadQueries.ResourceQueries

@@ -3,6 +3,7 @@ package istio
 import (
 	"github.com/deislabs/smi-metrics/pkg/mesh"
 	"github.com/prometheus/common/log"
+	v1 "k8s.io/api/core/v1"
 
 	"github.com/deislabs/smi-metrics/pkg/prometheus"
 	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
@@ -17,8 +18,8 @@ type resourceLookup struct {
 
 func (r *resourceLookup) Get(labels model.Metric) *metrics.TrafficMetrics {
 
-	var result *Result
-	src, dst, err := NewResult(labels)
+	var result *v1.ObjectReference
+	src, dst, err := GetObjectsReference(labels)
 	if err != nil {
 		log.Error(err)
 		return nil
