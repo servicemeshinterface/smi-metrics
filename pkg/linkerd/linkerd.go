@@ -54,18 +54,12 @@ func (l *Linkerd) GetEdgeMetrics(ctx context.Context,
 	interval *metrics.Interval,
 	details *mesh.ResourceDetails) (*metrics.TrafficMetricsList, error) {
 
-	lookup := &edgeLookup{
-		Item: metrics.NewTrafficMetricsList(&v1.ObjectReference{
-			Kind: query.Kind,
-			Name: query.Name,
-			// If a namespace isn't defined, it'll be the empty string which fits
-			// with the struct's idea of "empty"
-			Namespace: query.Namespace,
-		}, true),
-		details:  *details,
-		interval: interval,
-		queries:  l.queries.EdgeQueries,
-	}
+	lookup := prometheus.NewEdgeLookup(metrics.NewTrafficMetricsList(&v1.ObjectReference{
+		Kind:      query.Kind,
+		Name:      query.Name,
+		Namespace: query.Namespace,
+	}, true),
+		interval, *details, l.queries.EdgeQueries, getEdge)
 
 	if err := prometheus.NewClient(ctx, l.prometheusClient, interval).Update(
 		lookup); err != nil {
@@ -86,11 +80,10 @@ func (l *Linkerd) GetResourceMetrics(ctx context.Context,
 	// Get is somewhat of a special case as *most* handlers just return a list.
 	// Create a list with a fully specified object reference and then just
 	// return a single element to keep the code as similar as possible.
-	lookup := &resourceLookup{
-		Item:     metrics.NewTrafficMetricsList(obj, false),
-		interval: interval,
-		queries:  l.queries.ResourceQueries,
-	}
+	lookup := prometheus.NewResourceLookup(metrics.NewTrafficMetricsList(obj, false),
+		interval,
+		l.queries.ResourceQueries,
+		getResource)
 
 	if err := prometheus.NewClient(ctx, l.prometheusClient, interval).Update(
 		lookup); err != nil {

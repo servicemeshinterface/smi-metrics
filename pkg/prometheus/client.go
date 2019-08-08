@@ -20,7 +20,7 @@ type Query struct {
 }
 
 type Lookup interface {
-	Get(labels model.Metric) *metrics.TrafficMetrics
+	Get(edge model.Metric) *metrics.TrafficMetrics
 	Queries() []*Query
 }
 

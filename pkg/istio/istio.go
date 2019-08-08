@@ -69,18 +69,14 @@ func (l *Istio) GetEdgeMetrics(ctx context.Context,
 	}
 
 	log.Info(fmt.Sprintf("Query for %s/%s/%s", query.Namespace, query.Kind, query.Name))
-	lookup := &edgeLookup{
-		Item: metrics.NewTrafficMetricsList(&v1.ObjectReference{
-			Kind: query.Kind,
-			Name: query.Name,
-			// If a namespace isn't defined, it'll be the empty string which fits
-			// with the struct's idea of "empty"
-			Namespace: query.Namespace,
-		}, true),
-		details:  *details,
-		interval: interval,
-		queries:  queries,
-	}
+	// If a namespace isn't defined, it'll be the empty string which fits
+	// with the struct's idea of "empty"
+	lookup := prometheus.NewEdgeLookup(metrics.NewTrafficMetricsList(&v1.ObjectReference{
+		Kind:      query.Kind,
+		Name:      query.Name,
+		Namespace: query.Namespace,
+	}, true),
+		interval, *details, queries, getEdge)
 
 	if err := prometheus.NewClient(ctx, l.prometheusClient, interval).Update(
 		lookup); err != nil {
@@ -110,11 +106,10 @@ func (l *Istio) GetResourceMetrics(ctx context.Context,
 	// Get is somewhat of a special case as *most* handlers just return a list.
 	// Create a list with a fully specified object reference and then just
 	// return a single element to keep the code as similar as possible.
-	lookup := &resourceLookup{
-		Item:     metrics.NewTrafficMetricsList(obj, false),
-		interval: interval,
-		queries:  queries,
-	}
+	lookup := prometheus.NewResourceLookup(metrics.NewTrafficMetricsList(obj, false),
+		interval,
+		queries,
+		getResource)
 
 	if err := prometheus.NewClient(ctx, l.prometheusClient, interval).Update(
 		lookup); err != nil {
