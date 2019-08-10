@@ -31,7 +31,7 @@ func newObjectReference(name, namespace, kind string) *v1.ObjectReference {
 	return &v1.ObjectReference{
 		Name:      name,
 		Namespace: namespace,
-		Kind:      kind,
+		Kind:      strings.Title(strings.TrimSuffix(kind, "s")),
 	}
 }
 
