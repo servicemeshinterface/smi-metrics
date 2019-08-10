@@ -124,7 +124,7 @@ func objectReferencesFromPodLabels(labels model.Metric) (source, destination *v1
 
 	if val, ok := labels[destinationPod]; ok {
 		// Present at Destination
-		src, err = ObjectReferenceFromPodLabel(val)
+		dst, err = ObjectReferenceFromPodLabel(val)
 		if err != nil {
 			return nil, nil, err
 		}
