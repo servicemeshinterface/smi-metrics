@@ -12,7 +12,6 @@ import (
 	"github.com/deislabs/smi-metrics/pkg/prometheus"
 	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	"github.com/prometheus/client_golang/api"
-	log "github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -54,18 +53,23 @@ func (l *Linkerd) GetEdgeMetrics(ctx context.Context,
 	interval *metrics.Interval,
 	details *mesh.ResourceDetails) (*metrics.TrafficMetricsList, error) {
 
-	lookup := prometheus.NewEdgeLookup(metrics.NewTrafficMetricsList(&v1.ObjectReference{
+	obj := &v1.ObjectReference{
 		Kind:      query.Kind,
 		Name:      query.Name,
 		Namespace: query.Namespace,
-	}, true),
-		interval, *details, l.queries.EdgeQueries, getEdge)
+	}
 
-	if err := prometheus.NewClient(ctx, l.prometheusClient, interval).Update(
-		lookup); err != nil {
+	metricList, err := prometheus.GetEdgeTraffifMetricsList(ctx,
+		obj,
+		interval,
+		details,
+		l.queries.EdgeQueries,
+		l.prometheusClient, getEdge)
+	if err != nil {
 		return nil, err
 	}
-	return lookup.Item, nil
+
+	return metricList, nil
 }
 
 func (l *Linkerd) GetResourceMetrics(ctx context.Context,
@@ -77,21 +81,16 @@ func (l *Linkerd) GetResourceMetrics(ctx context.Context,
 		obj.Name = query.Name
 	}
 
-	// Get is somewhat of a special case as *most* handlers just return a list.
-	// Create a list with a fully specified object reference and then just
-	// return a single element to keep the code as similar as possible.
-	lookup := prometheus.NewResourceLookup(metrics.NewTrafficMetricsList(obj, false),
+	metricsList, err := prometheus.GetResourceTrafficMetricsList(ctx,
+		obj,
 		interval,
 		l.queries.ResourceQueries,
+		l.prometheusClient,
 		getResource)
-
-	if err := prometheus.NewClient(ctx, l.prometheusClient, interval).Update(
-		lookup); err != nil {
-		log.Error(err)
+	if err != nil {
 		return nil, err
 	}
-
-	return lookup.Item, nil
+	return metricsList, nil
 }
 
 func NewLinkerdProvider(config Config) (*Linkerd, error) {

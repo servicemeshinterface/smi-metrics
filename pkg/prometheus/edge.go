@@ -17,7 +17,7 @@ type EdgeLookup struct {
 	getEdge  getEdgeFunc
 }
 
-func NewEdgeLookup(item *metrics.TrafficMetricsList,
+func newEdgeLookup(item *metrics.TrafficMetricsList,
 	interval *metrics.Interval,
 	details mesh.ResourceDetails,
 	queries map[string]string,

@@ -2,7 +2,6 @@ package istio
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/deislabs/smi-metrics/pkg/mesh"
 
@@ -13,7 +12,6 @@ import (
 	"github.com/deislabs/smi-metrics/pkg/prometheus"
 	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	"github.com/prometheus/client_golang/api"
-	log "github.com/sirupsen/logrus"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -67,22 +65,24 @@ func (l *Istio) GetEdgeMetrics(ctx context.Context,
 	default:
 		queries = l.config.WorkloadQueries.EdgeQueries
 	}
-
-	log.Info(fmt.Sprintf("Query for %s/%s/%s", query.Namespace, query.Kind, query.Name))
-	// If a namespace isn't defined, it'll be the empty string which fits
-	// with the struct's idea of "empty"
-	lookup := prometheus.NewEdgeLookup(metrics.NewTrafficMetricsList(&v1.ObjectReference{
+	obj := &v1.ObjectReference{
 		Kind:      query.Kind,
 		Name:      query.Name,
 		Namespace: query.Namespace,
-	}, true),
-		interval, *details, queries, getEdge)
+	}
 
-	if err := prometheus.NewClient(ctx, l.prometheusClient, interval).Update(
-		lookup); err != nil {
+	metricList, err := prometheus.GetEdgeTraffifMetricsList(ctx,
+		obj,
+		interval,
+		details,
+		queries,
+		l.prometheusClient,
+		getEdge)
+	if err != nil {
 		return nil, err
 	}
-	return lookup.Item, nil
+
+	return metricList, nil
 }
 
 func (l *Istio) GetResourceMetrics(ctx context.Context,
@@ -103,21 +103,17 @@ func (l *Istio) GetResourceMetrics(ctx context.Context,
 	default:
 		queries = l.config.WorkloadQueries.ResourceQueries
 	}
-	// Get is somewhat of a special case as *most* handlers just return a list.
-	// Create a list with a fully specified object reference and then just
-	// return a single element to keep the code as similar as possible.
-	lookup := prometheus.NewResourceLookup(metrics.NewTrafficMetricsList(obj, false),
+
+	metricList, err := prometheus.GetResourceTrafficMetricsList(ctx,
+		obj,
 		interval,
 		queries,
+		l.prometheusClient,
 		getResource)
-
-	if err := prometheus.NewClient(ctx, l.prometheusClient, interval).Update(
-		lookup); err != nil {
-		log.Error(err)
+	if err != nil {
 		return nil, err
 	}
-
-	return lookup.Item, nil
+	return metricList, err
 }
 
 func NewIstioProvider(config Config) (*Istio, error) {

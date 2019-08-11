@@ -17,7 +17,7 @@ type ResourceLookup struct {
 	getResource getResourceFunc
 }
 
-func NewResourceLookup(item *metrics.TrafficMetricsList,
+func newResourceLookup(item *metrics.TrafficMetricsList,
 	interval *metrics.Interval,
 	queries map[string]string,
 	getResource getResourceFunc) *ResourceLookup {
