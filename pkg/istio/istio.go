@@ -1,4 +1,4 @@
-package linkerd
+package istio
 
 import (
 	"context"
@@ -16,9 +16,10 @@ import (
 )
 
 type Config struct {
-	PrometheusURL   string            `yaml:"prometheusUrl"`
-	ResourceQueries map[string]string `yaml:"resourceQueries"`
-	EdgeQueries     map[string]string `yaml:"edgeQueries"`
+	PrometheusURL    string  `yaml:"prometheusUrl"`
+	NamespaceQueries Queries `yaml:"namespaceQueries"`
+	PodQueries       Queries `yaml:"podQueries"`
+	WorkloadQueries  Queries `yaml:"workloadQueries"`
 }
 
 type Queries struct {
@@ -26,12 +27,13 @@ type Queries struct {
 	EdgeQueries     map[string]string `yaml:"edgeQueries"`
 }
 
-type Linkerd struct {
-	queries          Queries
+type Istio struct {
+	config           Config
 	prometheusClient promv1.API
 }
 
-func (l *Linkerd) GetSupportedResources(ctx context.Context) (*metav1.APIResourceList, error) {
+func (l *Istio) GetSupportedResources(ctx context.Context) (*metav1.APIResourceList, error) {
+
 	lst := &metav1.APIResourceList{
 		TypeMeta: metav1.TypeMeta{
 			Kind:       "APIResourceList",
@@ -48,11 +50,21 @@ func (l *Linkerd) GetSupportedResources(ctx context.Context) (*metav1.APIResourc
 	return lst, nil
 }
 
-func (l *Linkerd) GetEdgeMetrics(ctx context.Context,
+func (l *Istio) GetEdgeMetrics(ctx context.Context,
 	query mesh.Query,
 	interval *metrics.Interval,
 	details *mesh.ResourceDetails) (*metrics.TrafficMetricsList, error) {
 
+	var queries map[string]string
+
+	switch query.Kind {
+	case "Namespace":
+		queries = l.config.NamespaceQueries.EdgeQueries
+	case "Pod":
+		queries = l.config.PodQueries.EdgeQueries
+	default:
+		queries = l.config.WorkloadQueries.EdgeQueries
+	}
 	obj := &v1.ObjectReference{
 		Kind:      query.Kind,
 		Name:      query.Name,
@@ -63,8 +75,9 @@ func (l *Linkerd) GetEdgeMetrics(ctx context.Context,
 		obj,
 		interval,
 		details,
-		l.queries.EdgeQueries,
-		l.prometheusClient, getEdge)
+		queries,
+		l.prometheusClient,
+		getEdge)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +85,7 @@ func (l *Linkerd) GetEdgeMetrics(ctx context.Context,
 	return metricList, nil
 }
 
-func (l *Linkerd) GetResourceMetrics(ctx context.Context,
+func (l *Istio) GetResourceMetrics(ctx context.Context,
 	query mesh.Query,
 	interval *metrics.Interval) (*metrics.TrafficMetricsList, error) {
 
@@ -81,19 +94,29 @@ func (l *Linkerd) GetResourceMetrics(ctx context.Context,
 		obj.Name = query.Name
 	}
 
-	metricsList, err := prometheus.GetResourceTrafficMetricsList(ctx,
+	var queries map[string]string
+	switch query.Kind {
+	case Namespace:
+		queries = l.config.NamespaceQueries.ResourceQueries
+	case Pod:
+		queries = l.config.PodQueries.ResourceQueries
+	default:
+		queries = l.config.WorkloadQueries.ResourceQueries
+	}
+
+	metricList, err := prometheus.GetResourceTrafficMetricsList(ctx,
 		obj,
 		interval,
-		l.queries.ResourceQueries,
+		queries,
 		l.prometheusClient,
 		getResource)
 	if err != nil {
 		return nil, err
 	}
-	return metricsList, nil
+	return metricList, err
 }
 
-func NewLinkerdProvider(config Config) (*Linkerd, error) {
+func NewIstioProvider(config Config) (*Istio, error) {
 
 	// Creating a Prometheus Client
 	promClient, err := api.NewClient(api.Config{Address: config.PrometheusURL})
@@ -101,13 +124,8 @@ func NewLinkerdProvider(config Config) (*Linkerd, error) {
 		return nil, err
 	}
 
-	queries := Queries{
-		ResourceQueries: config.ResourceQueries,
-		EdgeQueries:     config.EdgeQueries,
-	}
-
-	return &Linkerd{
-		queries:          queries,
+	return &Istio{
+		config:           config,
 		prometheusClient: promv1.NewAPI(promClient),
 	}, nil
 }

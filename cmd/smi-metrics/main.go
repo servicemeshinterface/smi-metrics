@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/deislabs/smi-metrics/pkg/istio"
+
 	"github.com/deislabs/smi-metrics/pkg/linkerd"
 	"github.com/deislabs/smi-metrics/pkg/mesh"
 	"github.com/fsnotify/fsnotify"
@@ -225,6 +227,16 @@ func run(_ *cobra.Command, args []string) {
 		meshInstance, err = linkerd.NewLinkerdProvider(config)
 		if err != nil {
 			log.Fatal("Couldn't create a Linkerd instance", err)
+		}
+	case "istio":
+		var config istio.Config
+		err = viper.UnmarshalKey("istio", &config)
+		if err != nil {
+			log.Fatalf("Unable to unmarshal config into struct")
+		}
+		meshInstance, err = istio.NewIstioProvider(config)
+		if err != nil {
+			log.Fatal("Couldn't create a Istio instance", err)
 		}
 	default:
 		log.Fatalf("Unable to recognize the mesh type")
