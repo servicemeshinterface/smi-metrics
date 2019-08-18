@@ -5,6 +5,5 @@ image:
   pullPolicy: IfNotPresent
 
 config:
-  prometheus-url: http://linkerd-prometheus.linkerd.svc.cluster.local:9090
-
+  log-level: info
 resources: {}

@@ -1,0 +1,107 @@
+{{ if and (not .Values.default) (eq .Values.adapter "istio") }}
+apiVersion: "config.istio.io/v1alpha2"
+kind: instance
+metadata:
+  name: smirequestcount
+  namespace: istio-system
+  labels:
+    app: mixer
+    chart: mixer
+    heritage: Tiller
+    release: istio
+spec:
+  compiledTemplate: metric
+  params:
+    value: "1"
+    dimensions:
+      source_workload_namespace: source.workload.namespace | "unknown"
+      destination_workload_namespace: destination.workload.namespace | "unknown"
+      source_owner: source.owner | "unknown"
+      destination_owner: destination.owner | "unknown"
+      source_uid: source.uid | "unknown"
+      destination_uid: destination.uid | "unknown"
+      response_code: response.code | 200
+    monitored_resource_type: '"UNSPECIFIED"'
+---
+apiVersion: "config.istio.io/v1alpha2"
+kind: instance
+metadata:
+  name: smirequestduration
+  namespace: istio-system
+  labels:
+    app: mixer
+    chart: mixer
+    heritage: Tiller
+    release: istio
+spec:
+  compiledTemplate: metric
+  params:
+    value: response.duration | "0ms"
+    dimensions:
+      source_workload_namespace: source.workload.namespace | "unknown"
+      destination_workload_namespace: destination.workload.namespace | "unknown"
+      source_owner: source.owner | "unknown"
+      destination_owner: destination.owner | "unknown"
+      source_uid: source.uid | "unknown"
+      destination_uid: destination.uid | "unknown"
+    monitored_resource_type: '"UNSPECIFIED"'
+---
+apiVersion: "config.istio.io/v1alpha2"
+kind: handler
+metadata:
+  name: smi-prometheus
+  namespace: istio-system
+  labels:
+    app: mixer
+    chart: mixer
+    heritage: Tiller
+    release: istio
+spec:
+  compiledAdapter: prometheus
+  params:
+    metricsExpirationPolicy:
+      metricsExpiryDuration: "10m"
+    metrics:
+      - name: smi_requests_total
+        instance_name: smirequestcount.instance.istio-system
+        kind: COUNTER
+        label_names:
+          - response_code
+          - source_owner
+          - destination_owner
+          - source_workload_namespace
+          - destination_workload_namespace
+          - source_uid
+          - destination_uid
+      - name: smi_request_duration_seconds
+        instance_name: smirequestduration.instance.istio-system
+        kind: DISTRIBUTION
+        label_names:
+          - source_owner
+          - destination_owner
+          - source_workload_namespace
+          - destination_workload_namespace
+          - source_uid
+          - destination_uid
+        buckets:
+          explicit_buckets:
+            bounds: [0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10]
+---
+apiVersion: "config.istio.io/v1alpha2"
+kind: rule
+metadata:
+  name: smiprom
+  namespace: istio-system
+  labels:
+    app: mixer
+    chart: mixer
+    heritage: Tiller
+    release: istio
+spec:
+  match: (context.protocol == "http" || context.protocol == "grpc") && (match((request.useragent | "-"), "kube-probe*") == false) && (match((request.useragent | "-"), "Prometheus*") == false)
+  actions:
+    - handler: smi-prometheus
+      instances:
+        - smirequestcount
+        - smirequestduration
+{{ end }}
