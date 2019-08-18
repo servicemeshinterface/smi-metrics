@@ -2,7 +2,20 @@
 
 The SMI Metrics Extension APIService makes use of prometheus metrics exposed by Istio to resopond to metric queries like p90, request counts, etc.
 
-There is a configuration change required on the Istio metrics for SMI Metrics to work, as the default metrics dosen't have enough information to relate thosoe metrics with that of Kubernetes resources.
+## Out of the Box Installation
+
+As Istio allows metrics to be configurable, SMI with Istio can be installed by directly running
+
+```bash
+helm template chart --set adapter=istio | k apply -f -
+```
+This installs the necessary instances, handlers and rules for Istio to emit those metrics along with SMI-Metrics APIServer.
+
+## Using the default Istio Metrics
+
+If the user dosen't want to add more metrics to their Istio installations, they can go with this way, where some metrics have to be configured to add more labels that SMI-Metrics uses.
+
+There is a configuration change required on the Istio metrics for SMI Metrics to work, as the default metrics dosen't have enough information to relate those metrics with that of Kubernetes resources.
 
 SMI Metrics makes use of the following Metric Instances in Istio:
 
@@ -195,7 +208,7 @@ A full Installation manifest with those updates can be found [here](https://gist
 To verify if the labels are added correctly, prometheus metrics can be checked to see if those metrics have the configured labels.
 
 
-## Installation of SMI
+### Installation
 
 Once Istio is installed with the above mentioned configuration, SMI-Metrics can be installed by cloning the repo and running
 
