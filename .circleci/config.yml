@@ -1,10 +1,10 @@
-version: 2 
+version: 2
 jobs:
-  build: 
-    docker: 
+  build:
+    docker:
       - image: circleci/golang:1.12
 
-    steps: 
+    steps:
       - checkout
       - restore_cache:
           keys:
@@ -21,8 +21,54 @@ jobs:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
+  release:
+    docker:
+      - image: circleci/golang:1.12
+    working_directory: /go/src/github.com/deislabs/smi-metrics
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run: go get -u github.com/mitchellh/gox
+      - run: go get -u github.com/tcnksm/ghr
+      - run: go get -u github.com/stevenmatthewt/semantics
+      - run:
+          name: cross compiling
+          command: |
+            env GO111MODULE=on go mod vendor
+            gox -os="linux darwin windows" -arch="amd64" -output="dist/smi_metrics_{{.OS}}_{{.Arch}}" ./cmd/smi-metrics
+            cd dist/ && gzip *
+      - run:
+          name: docker build
+          command: |
+            docker build -t  deislabs/smi-metrics .
+      - add_ssh_keys:
+          fingerprints:
+            - "<<InsertFingerprintHere>>"
+      - run:
+          name: pushing docker image and creating github release
+          command: |
+            set +e
+            tag=$(semantics --output-tag)
+            if [ $? -eq 0 ]; then
+              docker tag deislabs/smi-metrics deislabs/smi-metrics:$tag
+              docker login -u $DOCKER_USER -p $DOCKER_PASS
+              docker push deislabs/smi-metrics:$tag
+              ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace $tag dist/
+            else
+              echo "The commit message(s) did not indicate a major/minor/patch version."
+            fi
+
 workflows:
   version: 2
   build-workflow:
     jobs:
       - build
+      - release:
+          context: release-context
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+              
