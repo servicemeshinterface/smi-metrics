@@ -5,9 +5,9 @@ image:
   pullPolicy: IfNotPresent
 
 config:
-  log-level: info
-  # api-port: port listen on for api related requests
-  # admin-port: port listen on for admin related requests
-  # tls-cert-file: path of TLS Certificate file to use
-  # tls-private-key: path of TLS private key to use
+  # log-level: info
+  # api-port: 8080
+  # admin-port: 8081
+  # tls-cert-file: /var/run/smi-metrics/tls.crt
+  # tls-private-key: /var/run/smi-metrics/tls.key
 resources: {}
