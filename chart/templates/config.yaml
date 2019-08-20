@@ -11,12 +11,10 @@ data:
   config.yml: |
     {{- $files := .Files }}
     {{- if eq .Values.adapter "istio" }}
-      {{- if .Values.default }}
-        {{- $files.Get "default_istio.yaml" | nindent 4 -}}
-      {{ else }}
-        {{- $files.Get "istio.yaml" | nindent 4 -}}
-      {{- end }}
+      {{- $files.Get "istio.yaml" | nindent 4 -}}
     {{- else if eq .Values.adapter "linkerd" }}
       {{- $files.Get "linkerd.yaml" | nindent 4 -}}
     {{- end }}
-    {{- .Values.config | toYaml | nindent 4 }}
+    {{- if .Values.config }}
+      {{- .Values.config | toYaml | nindent 4 -}}
+    {{- end }}

@@ -1,4 +1,4 @@
-{{ if and (not .Values.default) (eq .Values.adapter "istio") }}
+{{ if eq .Values.adapter "istio" }}
 apiVersion: "config.istio.io/v1alpha2"
 kind: instance
 metadata:
