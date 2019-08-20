@@ -33,28 +33,27 @@ jobs:
       - run: go get -u github.com/tcnksm/ghr
       - run: go get -u github.com/stevenmatthewt/semantics
       - run:
-          name: cross compiling
+          name: Docker build and push
           command: |
-            env GO111MODULE=on go mod vendor
-            gox -os="linux darwin windows" -arch="amd64" -output="dist/smi_metrics_{{.OS}}_{{.Arch}}" ./cmd/smi-metrics
-            cd dist/ && gzip *
-      - run:
-          name: docker build
-          command: |
-            docker build -t  deislabs/smi-metrics .
+            COMMIT_TAG=$(echo $CIRCLE_SHA1 | cut -c -7)
+            echo 'export COMMIT_TAG="$(echo $CIRCLE_SHA1 | cut -c -7)"' >> $BASH_ENV
+            docker login -u $DOCKER_USER -p $DOCKER_PASS $REGISTRY_HOST
+            env IMAGE=$REGISTRY_HOST/smi-metrics TAG=$COMMIT_TAG make push
       - add_ssh_keys:
           fingerprints:
             - "<<InsertFingerprintHere>>"
       - run:
-          name: pushing docker image and creating github release
+          name: Checking for a release structure on commit, and performing a github release if needed
           command: |
             set +e
             tag=$(semantics --output-tag)
             if [ $? -eq 0 ]; then
-              docker tag deislabs/smi-metrics deislabs/smi-metrics:$tag
-              docker login -u $DOCKER_USER -p $DOCKER_PASS
-              docker push deislabs/smi-metrics:$tag
-              ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace $tag dist/
+              docker tag $REGISTRY_HOST/smi-metrics:COMMIT_TAG $REGISTRY_HOST/smi-metrics:$tag
+              docker push $REGISTRY_HOST/smi-metrics:$tag
+              env GO111MODULE=on make vendor
+              make binaries
+              cd dist/ && gzip *
+              ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace $tag ./
             else
               echo "The commit message(s) did not indicate a major/minor/patch version."
             fi
@@ -71,4 +70,3 @@ workflows:
           filters:
             branches:
               only: master
-              
