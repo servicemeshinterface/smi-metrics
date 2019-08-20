@@ -8,13 +8,19 @@ Here, the metrics are about the inbound and outbound requests i.e their Golden M
 For Linkerd:
 
 ```bash
-helm template chart -f dev.yaml -f linkerd.yaml --name dev | kubectl apply -f -
+helm template chart --set adapter=linkerd | kubectl apply -f -
+```
+
+For Istio
+
+```bash
+helm template chart --set adapter=istio | kubectl apply -f -
 ```
 
 ## Roadmap
 
-The API supports [linkerd](https://linkerd.io/) right now.
-The support for [Istio](https://istio.io/) and [Consul](https://learn.hashicorp.com/consul/) is being worked up on right now and the API and responses will have the same structure unless there are no changes to the spec.
+The API supports [linkerd](https://linkerd.io/)  and [Istio](https://istio.io/) right now.
+The support for  [Consul](https://learn.hashicorp.com/consul/) is being worked up on right now and the API and responses will have the same structure unless there are no changes to the spec.
 
 ## Working
 

@@ -114,15 +114,6 @@ func cmdFlags(flags *pflag.FlagSet) error {
 		return err
 	}
 
-	flags.String(
-		"prometheus-url",
-		"http://prometheus.default.svc.cluster.local:9090",
-		"URL to use for connecting to prometheus of the format: hostname:port",
-	)
-	if err := bindFlag(flags.Lookup("prometheus-url")); err != nil {
-		return err
-	}
-
 	return nil
 }
 
@@ -211,10 +202,10 @@ func init() {
 func run(_ *cobra.Command, args []string) {
 	log.Infof("api listening on %d", viper.GetInt("api-port"))
 	log.Infof("admin listening on %d", viper.GetInt("admin-port"))
+	log.Infof("Mesh Config of type %s", viper.GetString("mesh"))
 
 	var meshInstance mesh.Mesh
 	var err error
-	log.Info("Mesh Config", viper.GetString("mesh"))
 
 	switch provider := viper.GetString("mesh"); provider {
 	case "linkerd":

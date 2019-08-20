@@ -9,4 +9,12 @@ metadata:
   name: {{ include "smi-metrics.fullname" . }}
 data:
   config.yml: |
-    {{- .Values.config | toYaml | nindent 4 }}
+    {{- $files := .Files }}
+    {{- if eq .Values.adapter "istio" }}
+      {{- $files.Get "istio.yaml" | nindent 4 -}}
+    {{- else if eq .Values.adapter "linkerd" }}
+      {{- $files.Get "linkerd.yaml" | nindent 4 -}}
+    {{- end }}
+    {{- if .Values.config }}
+      {{- .Values.config | toYaml | nindent 4 -}}
+    {{- end }}

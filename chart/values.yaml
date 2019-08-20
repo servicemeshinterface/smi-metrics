@@ -5,6 +5,9 @@ image:
   pullPolicy: IfNotPresent
 
 config:
-  prometheus-url: http://linkerd-prometheus.linkerd.svc.cluster.local:9090
-
+  # log-level: info
+  # api-port: 8080
+  # admin-port: 8081
+  # tls-cert-file: /var/run/smi-metrics/tls.crt
+  # tls-private-key: /var/run/smi-metrics/tls.key
 resources: {}
