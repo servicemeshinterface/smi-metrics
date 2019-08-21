@@ -35,7 +35,7 @@ jobs:
             COMMIT_TAG=$(echo $CIRCLE_SHA1 | cut -c -7) 
             echo 'export COMMIT_TAG="$(echo $CIRCLE_SHA1 | cut -c -7)"' >> $BASH_ENV
             docker login -u $DOCKER_USER -p $DOCKER_PASS
-            env IMAGE=$GITHUB_USER/smi-metrics TAG=$COMMIT_TAG make push
+            env IMAGE=deislabs/smi-metrics TAG=$COMMIT_TAG make push
       - add_ssh_keys:
           fingerprints:
             - "<<InsertFingerPrinthere>>"
