@@ -7,7 +7,7 @@ HAS_SEMANTICS := $(shell command -v semantics;)
 
 # Check for already defined environment variables
 TAG ?= $(shell git describe --exact-match --tags $(git log -n1 --pretty='%h'))
-IMAGE ?= thomasr/smi-metrics
+IMAGE ?= deislabs/smi-metrics
 
 .PHONY: release-bootstrap
 release-bootstrap:
@@ -66,7 +66,7 @@ release: release-bootstrap
 	@if [ $(RELEASE_TAG) ]; then \
 	  echo "Tagging the latest commit image with tag: ${RELEASE_TAG}"; \
 	  docker tag ${IMAGE}:${COMMIT_TAG} ${IMAGE}:${RELEASE_TAG}; \
-	  echo "Pusing the docker image: ${IMAGE}:${RELEASE_TAG} "; \
+	  echo "Pushing the docker image: ${IMAGE}:${RELEASE_TAG} "; \
 	  docker push ${IMAGE}:${RELEASE_TAG}; \
 	  echo "Generating binaries for Github Release"; \
 	  env GO111MODULE=on make vendor; \
