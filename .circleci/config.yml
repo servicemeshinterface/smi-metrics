@@ -1,10 +1,10 @@
-version: 2 
+version: 2
 jobs:
-  build: 
-    docker: 
+  build:
+    docker:
       - image: circleci/golang:1.12
 
-    steps: 
+    steps:
       - checkout
       - restore_cache:
           keys:
@@ -21,8 +21,40 @@ jobs:
           key: go-mod-v4-{{ checksum "go.sum" }}
           paths:
             - "/go/pkg/mod"
+  release:
+    docker:
+      - image: circleci/golang:1.12
+    working_directory: /go/src/github.com/deislabs/smi-metrics
+    steps:
+      - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
+      - run:
+          name: Docker build and push
+          command: |
+            COMMIT_TAG=$(echo $CIRCLE_SHA1 | cut -c -7) 
+            echo 'export COMMIT_TAG="$(echo $CIRCLE_SHA1 | cut -c -7)"' >> $BASH_ENV
+            docker login docker.pkg.github.com -u $GITHUB_USER -p $GITHUB_TOKEN
+            env IMAGE=docker.pkg.github.com/$GITHUB_USER/smi-metrics/smi-metrics TAG=$COMMIT_TAG make push
+      - add_ssh_keys:
+          fingerprints:
+            - "<<InsertFingerPrinthere>>"
+      - run:
+          name: Checking if the commit is a release
+          command: |
+           env IMAGE=docker.pkg.github.com/$GITHUB_USER/smi-metrics/smi-metrics make release
+
+
 workflows:
   version: 2
   build-workflow:
     jobs:
       - build
+      - release:
+          context: release-context
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
+              
