@@ -49,13 +49,18 @@ jobs:
 
 workflows:
   version: 2
-  build-workflow:
+  test-build-publish:
     jobs:
-    - test
+    - test:
+        filters:
+          tags:
+            only: /.*/
     - build:
         requires:
         - test
         filters:
+          tags:
+            only: /.*/
           branches:
             only: master
     - release:
@@ -64,3 +69,5 @@ workflows:
         filters:
           tags:
             only: /^v.*/
+          branches:
+            ignore: /.*/
