@@ -29,34 +29,21 @@ jobs:
       - checkout
       - setup_remote_docker:
           docker_layer_caching: true
-      - run: go get -u github.com/mitchellh/gox
-      - run: go get -u github.com/tcnksm/ghr
-      - run: go get -u github.com/stevenmatthewt/semantics
       - run:
           name: Docker build and push
           command: |
-            COMMIT_TAG=$(echo $CIRCLE_SHA1 | cut -c -7)
+            COMMIT_TAG=$(echo $CIRCLE_SHA1 | cut -c -7) 
             echo 'export COMMIT_TAG="$(echo $CIRCLE_SHA1 | cut -c -7)"' >> $BASH_ENV
-            docker login -u $DOCKER_USER -p $DOCKER_PASS $REGISTRY_HOST
-            env IMAGE=$REGISTRY_HOST/smi-metrics TAG=$COMMIT_TAG make push
+            docker login docker.pkg.github.com -u $GITHUB_USER -p $GITHUB_TOKEN
+            env IMAGE=docker.pkg.github.com/$GITHUB_USER/smi-metrics/smi-metrics TAG=$COMMIT_TAG make push
       - add_ssh_keys:
           fingerprints:
-            - "<<InsertFingerprintHere>>"
+            - "<<InsertFingerPrinthere>>"
       - run:
-          name: Checking for a release structure on commit, and performing a github release if needed
+          name: Checking if the commit is a release
           command: |
-            set +e
-            tag=$(semantics --output-tag)
-            if [ $? -eq 0 ]; then
-              docker tag $REGISTRY_HOST/smi-metrics:COMMIT_TAG $REGISTRY_HOST/smi-metrics:$tag
-              docker push $REGISTRY_HOST/smi-metrics:$tag
-              env GO111MODULE=on make vendor
-              make binaries
-              cd dist/ && gzip *
-              ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME --replace $tag ./
-            else
-              echo "The commit message(s) did not indicate a major/minor/patch version."
-            fi
+           env IMAGE=docker.pkg.github.com/$GITHUB_USER/smi-metrics/smi-metrics make release
+
 
 workflows:
   version: 2
@@ -69,4 +56,4 @@ workflows:
             - build
           filters:
             branches:
-              only: master
+              only: release
