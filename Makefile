@@ -3,11 +3,18 @@ ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 HAS_TILT := $(shell command -v tilt;)
 HAS_GOX := $(shell command -v gox;)
 HAS_GHR := $(shell command -v ghr;)
-HAS_SEMANTICS := $(shell command -v semantics;)
+HAS_HELM := $(shell command -v helm;)
 
-# Check for already defined environment variables
-TAG ?= $(shell git describe --exact-match --tags $(git log -n1 --pretty='%h'))
-IMAGE ?= deislabs/smi-metrics
+
+IMAGE_NAME      ?= deislabs/smi-metrics
+
+GIT_COMMIT      ?= $(shell git rev-parse --short HEAD)
+ifdef CIRCLE_TAG
+IMAGE           := ${IMAGE_NAME}:${CIRCLE_TAG}
+VERSION         := $(shell echo ${CIRCLE_TAG} | cut -c2- )
+else
+IMAGE           := ${IMAGE_NAME}:git-${GIT_COMMIT}
+endif
 
 .PHONY: release-bootstrap
 release-bootstrap:
@@ -21,12 +28,9 @@ ifndef HAS_GHR
 	@echo "Installing ghr"
 	go get -u github.com/tcnksm/ghr
 endif
-	@#Check for semantics
-ifndef HAS_SEMANTICS
-	@echo "Installing semantics"
-	go get -u github.com/stevenmatthewt/semantics
+ifndef HAS_HELM
+	set -x; curl -L https://git.io/get_helm.sh | bash
 endif
-
 
 .PHONY: bootstrap
 bootstrap:
@@ -51,37 +55,43 @@ vendor:
 dep:
 	go mod download
 
-.PHONY: binaries
-binaries:
-	gox -os="linux darwin windows" -arch="amd64" -output="dist/smi_metrics_{{.OS}}_{{.Arch}}" ./cmd/smi-metrics
+tmp:
+	mkdir tmp
+
+.PHONY: build-chart
+build-chart: tmp release-bootstrap
+ifndef CIRCLE_TAG
+	@echo "Missing CIRCLE_TAG, is this being run from circleci?"
+	@exit 1
+endif
+	cp -R chart tmp/smi-metrics
+	sed -i.bak 's/CHART_VERSION/${VERSION}/g' tmp/smi-metrics/Chart.yaml
+	helm package tmp/smi-metrics -d tmp --save=false
+	rm -rf tmp/smi-metrics/
 
 .PHONY: dev
 dev: bootstrap
 	tilt up
 
 .PHONY: release
-release: release-bootstrap
-	set +e \
-    $(eval RELEASE_TAG=$(shell semantics --output-tag))
-	@if [ $(RELEASE_TAG) ]; then \
-	  echo "Tagging the latest commit image with tag: ${RELEASE_TAG}"; \
-	  docker tag ${IMAGE}:${COMMIT_TAG} ${IMAGE}:${RELEASE_TAG}; \
-	  echo "Pushing the docker image: ${IMAGE}:${RELEASE_TAG} "; \
-	  docker push ${IMAGE}:${RELEASE_TAG}; \
-	  echo "Generating binaries for Github Release"; \
-	  env GO111MODULE=on make vendor; \
-	  make binaries; \
-	  cd dist/ && gzip *; \
-	  echo "Pushing the Github Release"; \
-	  ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} --replace ${RELEASE_TAG} ./; \
-	else \
-	  echo "The commit message(s) did not indicate a major/minor/patch version."; \
-	fi 
+release: release-bootstrap build-chart
+ifndef CIRCLE_TAG
+	@echo "Missing CIRCLE_TAG, is this being run from circleci?"
+	@exit 1
+endif
+ifndef GITHUB_TOKEN
+	@echo "Requires a GITHUB_TOKEN with edit permissions for releases."
+	@exit 1
+endif
+	ghr -t ${GITHUB_TOKEN} \
+		-u deislabs \
+		${CIRCLE_TAG} \
+		tmp/smi-metrics-*
 
 .PHONY: push
 push: build
-	docker push $(IMAGE):$(TAG)
+	docker push $(IMAGE)
 
 .PHONY: build
 build:
-	docker build -t $(IMAGE):$(TAG) .
+	docker build -t $(IMAGE) .
