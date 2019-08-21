@@ -83,8 +83,7 @@ ifndef GITHUB_TOKEN
 	@echo "Requires a GITHUB_TOKEN with edit permissions for releases."
 	@exit 1
 endif
-	ghr -t ${GITHUB_TOKEN} \
-		-u deislabs \
+	ghr -u deislabs \
 		${CIRCLE_TAG} \
 		tmp/smi-metrics-*
 
