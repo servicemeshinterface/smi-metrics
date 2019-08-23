@@ -66,6 +66,9 @@ ifndef CIRCLE_TAG
 endif
 	cp -R chart tmp/smi-metrics
 	sed -i.bak 's/CHART_VERSION/${VERSION}/g' tmp/smi-metrics/Chart.yaml
+	for fname in $$(grep -rnl '$*' tmp/smi-metrics); do \
+		sed -i.bak 's/VERSION/${CIRCLE_TAG}/g' $$fname; \
+	done
 	helm package tmp/smi-metrics -d tmp --save=false
 	rm -rf tmp/smi-metrics/
 

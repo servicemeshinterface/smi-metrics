@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  name: thomasr/smi-metrics:v1alpha1-0.1
+  name: deislabs/smi-metrics:VERSION
   pullPolicy: IfNotPresent
 
 config:
