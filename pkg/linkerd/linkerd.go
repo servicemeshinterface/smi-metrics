@@ -21,13 +21,8 @@ type Config struct {
 	EdgeQueries     map[string]string `yaml:"edgeQueries"`
 }
 
-type Queries struct {
-	ResourceQueries map[string]string `yaml:"resourceQueries"`
-	EdgeQueries     map[string]string `yaml:"edgeQueries"`
-}
-
 type Linkerd struct {
-	queries          Queries
+	queries          prometheus.Queries
 	prometheusClient promv1.API
 }
 
@@ -101,7 +96,7 @@ func NewLinkerdProvider(config Config) (*Linkerd, error) {
 		return nil, err
 	}
 
-	queries := Queries{
+	queries := prometheus.Queries{
 		ResourceQueries: config.ResourceQueries,
 		EdgeQueries:     config.EdgeQueries,
 	}

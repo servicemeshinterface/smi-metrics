@@ -10,6 +10,11 @@ import (
 	v1 "k8s.io/api/core/v1"
 )
 
+type Queries struct {
+	ResourceQueries map[string]string `yaml:"resourceQueries"`
+	EdgeQueries     map[string]string `yaml:"edgeQueries"`
+}
+
 func GetResourceTrafficMetricsList(ctx context.Context,
 	obj *v1.ObjectReference,
 	interval *metrics.Interval,
