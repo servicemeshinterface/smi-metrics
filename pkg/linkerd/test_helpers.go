@@ -8,10 +8,12 @@ import (
 	"path"
 	"time"
 
+	"github.com/deislabs/smi-metrics/pkg/metrics"
+	"github.com/deislabs/smi-metrics/pkg/prometheus"
+
 	"gopkg.in/yaml.v2"
 
 	"github.com/deislabs/smi-metrics/pkg/linkerd/mocks"
-	"github.com/deislabs/smi-metrics/pkg/metrics"
 	smimetrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/mock"
@@ -206,7 +208,7 @@ func (s *Suite) SetupTest() {
 	file, err := ioutil.ReadFile("test_queries.yaml")
 	s.Require().NoError(err)
 
-	var queries Queries
+	var queries prometheus.Queries
 	err = yaml.Unmarshal(file, &queries)
 	s.Require().NoError(err)
 

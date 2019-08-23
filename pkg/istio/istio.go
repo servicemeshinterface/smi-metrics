@@ -16,15 +16,10 @@ import (
 )
 
 type Config struct {
-	PrometheusURL    string  `yaml:"prometheusUrl"`
-	NamespaceQueries Queries `yaml:"namespaceQueries"`
-	PodQueries       Queries `yaml:"podQueries"`
-	WorkloadQueries  Queries `yaml:"workloadQueries"`
-}
-
-type Queries struct {
-	ResourceQueries map[string]string `yaml:"resourceQueries"`
-	EdgeQueries     map[string]string `yaml:"edgeQueries"`
+	PrometheusURL    string             `yaml:"prometheusUrl"`
+	NamespaceQueries prometheus.Queries `yaml:"namespaceQueries"`
+	PodQueries       prometheus.Queries `yaml:"podQueries"`
+	WorkloadQueries  prometheus.Queries `yaml:"workloadQueries"`
 }
 
 type Istio struct {
