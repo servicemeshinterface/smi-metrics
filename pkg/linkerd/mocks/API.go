@@ -175,6 +175,27 @@ func (_m *API) QueryRange(ctx context.Context, query string, r v1.Range) (model.
 	return r0, r1
 }
 
+// Rules provides a mock function with given fields: ctx
+func (_m *API) Rules(ctx context.Context) (v1.RulesResult, error) {
+	ret := _m.Called(ctx)
+
+	var r0 v1.RulesResult
+	if rf, ok := ret.Get(0).(func(context.Context) v1.RulesResult); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(v1.RulesResult)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // Series provides a mock function with given fields: ctx, matches, startTime, endTime
 func (_m *API) Series(ctx context.Context, matches []string, startTime time.Time, endTime time.Time) ([]model.LabelSet, error) {
 	ret := _m.Called(ctx, matches, startTime, endTime)

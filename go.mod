@@ -5,7 +5,7 @@ go 1.12
 require (
 	github.com/Masterminds/goutils v1.1.0 // indirect
 	github.com/Masterminds/semver v1.4.2 // indirect
-	github.com/deislabs/smi-sdk-go v0.0.0-20190509175445-11b06e5654f7
+	github.com/deislabs/smi-sdk-go v0.1.0
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-chi/chi v4.0.2+incompatible
@@ -17,7 +17,7 @@ require (
 	github.com/improbable-eng/go-httpwares v0.0.0-20190118142334-33c6690a604c
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/masterminds/sprig v2.18.0+incompatible
-	github.com/prometheus/client_golang v0.9.2
+	github.com/prometheus/client_golang v0.9.3-0.20190127221311-3c4408c8b829
 	github.com/prometheus/common v0.3.0
 	github.com/sirupsen/logrus v1.4.1
 	github.com/spf13/cobra v0.0.3
@@ -31,5 +31,6 @@ require (
 	k8s.io/api v0.0.0-20190409021203-6e4e0e4f393b
 	k8s.io/apimachinery v0.0.0-20190404173353-6a84e37a896d
 	k8s.io/client-go v11.0.0+incompatible
-	k8s.io/klog v0.3.0
+	k8s.io/klog v0.3.2
+	k8s.io/utils v0.0.0-20190506122338-8fab8cb257d5 // indirect
 )
