@@ -30,6 +30,7 @@ metadata:
     app.kubernetes.io/instance: {{ .Release.Name }}
     app.kubernetes.io/managed-by: {{ .Release.Service }}
   name: {{ include "smi-metrics.fullname" . }}
+  namespace: {{ .Release.Namespace }}
 type: kubernetes.io/tls
 data:
   tls.crt: {{ b64enc $cert.Cert }}

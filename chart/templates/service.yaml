@@ -2,6 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ include "smi-metrics.fullname" . }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: {{ include "smi-metrics.name" . }}
     helm.sh/chart: {{ include "smi-metrics.chart" . }}
