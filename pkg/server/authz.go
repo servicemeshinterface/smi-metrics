@@ -18,6 +18,10 @@ func (s *Server) authorizer(next http.Handler) http.Handler {
 			return
 		}
 
+		if len(s.clientNames) == 0 {
+				next.ServeHTTP(w, r)
+				return
+		}
 		for _, crt := range r.TLS.PeerCertificates {
 			name := crt.Subject.CommonName
 			if _, ok := s.clientNames[name]; ok {
