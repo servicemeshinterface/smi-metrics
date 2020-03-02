@@ -53,9 +53,16 @@ func (h *Handler) addInterval(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
+
+		t := r.URL.Query().Get("t")
+		window, err := time.ParseDuration(t)
+		if err != nil {
+			window = 30 * time.Second
+		}
+
 		ctx := context.WithValue(r.Context(), intervalKey, &metrics.Interval{
 			Timestamp: metav1.NewTime(start),
-			Window:    metav1.Duration{Duration: 30 * time.Second},
+			Window:    metav1.Duration{Duration: window},
 		})
 		next.ServeHTTP(w, r.WithContext(ctx))
 	})

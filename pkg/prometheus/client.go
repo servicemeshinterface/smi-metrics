@@ -3,6 +3,7 @@ package prometheus
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"text/template"
 
 	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
@@ -45,7 +46,8 @@ func (c *Client) render(
 	query string, opts map[string]interface{}) (string, error) {
 	buf := &bytes.Buffer{}
 
-	opts["window"] = c.interval.Window.Duration.String()
+	seconds := int(c.interval.Window.Duration.Seconds())
+	opts["window"] = fmt.Sprintf("%ds", seconds)
 
 	tmpl, err := template.New("query").Funcs(sprig.TxtFuncMap()).Parse(query)
 	if err != nil {
