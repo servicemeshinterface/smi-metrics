@@ -9,7 +9,8 @@ linkerd:
                           irate(
                             response_latency_ms_bucket{
                               namespace=~"{{default ".+" .namespace }}",
-                              {{lower .kind}}=~"{{default ".+" .name }}"
+                              {{lower .kind}}=~"{{default ".+" .name }}",
+                              direction="inbound"
                             }[{{.window}}]
                           )
                         ) by (
@@ -25,7 +26,8 @@ linkerd:
                           irate(
                             response_latency_ms_bucket{
                               namespace=~"{{default ".+" .namespace }}",
-                              {{lower .kind}}=~"{{default ".+" .name }}"
+                              {{lower .kind}}=~"{{default ".+" .name }}",
+                              direction="inbound"
                             }[{{.window}}]
                           )
                         ) by (
@@ -41,7 +43,8 @@ linkerd:
                           irate(
                             response_latency_ms_bucket{
                               namespace=~"{{default ".+" .namespace }}",
-                              {{lower .kind}}=~"{{default ".+" .name }}"
+                              {{lower .kind}}=~"{{default ".+" .name }}",
+                              direction="inbound"
                             }[{{.window}}]
                           )
                         ) by (
@@ -56,7 +59,8 @@ linkerd:
                   response_total{
                     classification="success",
                     namespace=~"{{default ".+" .namespace }}",
-                    {{lower .kind}}=~"{{default ".+" .name }}"
+                    {{lower .kind}}=~"{{default ".+" .name }}",
+                    direction="inbound"
                   }[{{.window}}]
                 )
               ) by (
@@ -69,7 +73,8 @@ linkerd:
                   response_total{
                     classification="failure",
                     namespace=~"{{default ".+" .namespace }}",
-                    {{lower .kind}}=~"{{default ".+" .name }}"
+                    {{lower .kind}}=~"{{default ".+" .name }}",
+                    direction="inbound"
                   }[{{.window}}]
                 )
               ) by (
