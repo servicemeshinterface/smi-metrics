@@ -53,7 +53,6 @@ func (h *Handler) addInterval(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		start := time.Now()
 
-
 		t := r.URL.Query().Get("t")
 		window, err := time.ParseDuration(t)
 		if err != nil {
