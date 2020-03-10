@@ -55,7 +55,7 @@ func (e *EdgeLookup) Queries() []*Query {
 			Template: tmpl,
 			Values: map[string]interface{}{
 				"kind":      e.Item.Resource.Kind,
-				"namespace": e.Item.Resource.Namespace,
+				"toNamespace": e.Item.Resource.Namespace,
 				"toName":    e.Item.Resource.Name,
 			},
 		})
