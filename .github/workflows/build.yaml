@@ -29,5 +29,5 @@ jobs:
     runs-on: ubuntu-latest
     - name: Docker Build and Push
       run: |
-        docker login -u $DOCKER_USER -p $DOCKER_PASS && \
+        docker login -u ${{ secrets.DOCKER_USER}} -p ${{ secrets.DOCKER_PASS}}  && \
         make push
