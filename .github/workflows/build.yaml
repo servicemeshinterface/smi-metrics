@@ -1,0 +1,33 @@
+name: Build and Testing
+on:
+  pull_request: {}
+  push:
+    paths-ignore:
+    - '*.md'
+    - '**/*.md'
+    branches:
+    - master
+jobs:
+  go_dependencies:
+    name: Go dependencies
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@master
+    - name: Setup Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.12
+    - name: Validate go deps
+      run: |
+        make dep
+    - name: Running go linting and unit tests
+      run: |
+         make lint tests
+  docker_build:
+    name: Docker images
+    runs-on: ubuntu-latest
+    - name: Docker Build and Push
+      run: |
+        docker login -u $DOCKER_USER -p $DOCKER_PASS && \
+        make push
