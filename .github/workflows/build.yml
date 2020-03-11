@@ -23,7 +23,7 @@ jobs:
         make dep
     - name: Running go linting and unit tests
       run: |
-         make lint tests
+         make lint test
   docker_build:
     name: Docker images
     runs-on: ubuntu-latest
