@@ -88,7 +88,8 @@ linkerd:
                         sum(
                           irate(
                             response_latency_ms_bucket{
-                              namespace=~"{{.namespace}}",
+                              namespace=~"{{default ".+" .namespace}}",
+                              dst_namespace=~"{{default ".+" .toNamespace}}",
                               {{lower .kind}}=~"{{default ".+" .fromName}}",
                               dst_{{lower .kind}}=~"{{default ".+" .toName}}"
                             }[{{.window}}]
@@ -107,7 +108,8 @@ linkerd:
                         sum(
                           irate(
                             response_latency_ms_bucket{
-                              namespace=~"{{.namespace}}",
+                              namespace=~"{{default ".+" .namespace}}",
+                              dst_namespace=~"{{default ".+" .toNamespace}}",
                               {{lower .kind}}=~"{{default ".+" .fromName}}",
                               dst_{{lower .kind}}=~"{{default ".+" .toName}}"
                             }[{{.window}}]
@@ -126,7 +128,8 @@ linkerd:
                         sum(
                           irate(
                             response_latency_ms_bucket{
-                              namespace=~"{{.namespace}}",
+                              namespace=~"{{default ".+" .namespace}}",
+                              dst_namespace=~"{{default ".+" .toNamespace}}",
                               {{lower .kind}}=~"{{default ".+" .fromName}}",
                               dst_{{lower .kind}}=~"{{default ".+" .toName}}"
                             }[{{.window}}]
@@ -144,7 +147,8 @@ linkerd:
                 increase(
                   response_total{
                     classification="success",
-                    namespace=~"{{.namespace}}",
+                    namespace=~"{{default ".+" .namespace}}",
+                    dst_namespace=~"{{default ".+" .toNamespace}}",
                     {{lower .kind}}=~"{{default ".+" .fromName}}",
                     dst_{{lower .kind}}=~"{{default ".+" .toName}}"
                   }[{{.window}}]
@@ -160,7 +164,8 @@ linkerd:
                 increase(
                   response_total{
                     classification="failure",
-                    namespace=~"{{.namespace}}",
+                    namespace=~"{{default ".+" .namespace}}",
+                    dst_namespace=~"{{default ".+" .toNamespace}}",
                     {{lower .kind}}=~"{{default ".+" .fromName}}",
                     dst_{{lower .kind}}=~"{{default ".+" .toName}}"
                   }[{{.window}}]
