@@ -36,5 +36,5 @@ jobs:
         make push
     - name: Performing a Github release
       run: |
-        GITHUB_TOKEN=${{secrets.GITHUB_TOKEN}}
+        export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
         make release
