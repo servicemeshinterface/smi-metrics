@@ -40,7 +40,7 @@ jobs:
     name: Docker Push and Release
     needs: docker_build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && startsWith(github.ref, 'v')
     steps:
     - name: Set env
       run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF/refs\/tags\//}
