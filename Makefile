@@ -9,9 +9,9 @@ HAS_HELM := $(shell command -v helm;)
 IMAGE_NAME      ?= deislabs/smi-metrics
 
 GIT_COMMIT      ?= $(shell git rev-parse --short HEAD)
-ifdef CIRCLE_TAG
-IMAGE           := ${IMAGE_NAME}:${CIRCLE_TAG}
-VERSION         := $(shell echo ${CIRCLE_TAG} | cut -c2- )
+ifdef RELEASE_VERSION
+IMAGE           := ${IMAGE_NAME}:${RELEASE_VERSION}
+VERSION         := $(shell echo ${RELEASE_VERSION} | cut -c2- )
 else
 IMAGE           := ${IMAGE_NAME}:git-${GIT_COMMIT}
 endif
@@ -60,14 +60,14 @@ tmp:
 
 .PHONY: build-chart
 build-chart: tmp release-bootstrap
-ifndef CIRCLE_TAG
-	@echo "Missing CIRCLE_TAG, is this being run from circleci?"
+ifndef RELEASE_VERSION
+	@echo "Missing RELEASE_VERSION, is this being run from CI?"
 	@exit 1
 endif
 	cp -R chart tmp/smi-metrics
 	sed -i.bak 's/CHART_VERSION/${VERSION}/g' tmp/smi-metrics/Chart.yaml
 	for fname in $$(grep -rnl '$*' tmp/smi-metrics); do \
-		sed -i.bak 's/VERSION/${CIRCLE_TAG}/g' $$fname; \
+		sed -i.bak 's/VERSION/${RELEASE_VERSION}/g' $$fname; \
 	done
 	helm package tmp/smi-metrics -d tmp --save=false
 	rm -rf tmp/smi-metrics/
@@ -78,8 +78,8 @@ dev: bootstrap
 
 .PHONY: release
 release: release-bootstrap build-chart
-ifndef CIRCLE_TAG
-	@echo "Missing CIRCLE_TAG, is this being run from circleci?"
+ifndef RELEASE_VERSION
+	@echo "Missing RELEASE_VERSION, is this being run from CI?"
 	@exit 1
 endif
 ifndef GITHUB_TOKEN
@@ -87,7 +87,7 @@ ifndef GITHUB_TOKEN
 	@exit 1
 endif
 	ghr -u deislabs \
-		${CIRCLE_TAG} \
+		${RELEASE_VERSION} \
 		tmp/smi-metrics-*
 
 .PHONY: push
