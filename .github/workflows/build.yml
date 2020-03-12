@@ -33,8 +33,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@master
-    - name: Set env
-      run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF/refs\/tags\//}
     - name: Docker Build
       run: |
         make build
