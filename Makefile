@@ -2,7 +2,6 @@ ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 HAS_TILT := $(shell command -v tilt;)
 HAS_GHR := $(shell command -v ghr;)
-HAS_HELM := $(shell command -v helm;)
 
 
 IMAGE_NAME      ?= deislabs/smi-metrics
@@ -17,13 +16,12 @@ endif
 
 .PHONY: release-bootstrap
 release-bootstrap:
+	@echo "Installing Helm v2"
+	set -x; curl -L https://git.io/get_helm.sh | bash
 	@#Check for ghr
 ifndef HAS_GHR
 	@echo "Installing ghr"
 	go get -u github.com/tcnksm/ghr
-endif
-ifndef HAS_HELM
-	set -x; curl -L https://git.io/get_helm.sh | bash
 endif
 
 .PHONY: bootstrap
