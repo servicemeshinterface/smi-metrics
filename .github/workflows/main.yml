@@ -3,12 +3,11 @@ on:
   pull_request: {}
   push:
     tags:
-      - 'v*.*.*'
+    - 'v*.*.*'
     paths-ignore:
     - '*.md'
     - '**/*.md'
-    branches:
-    - master
+
 jobs:
   go_build_test:
     name: Go Build and Test
@@ -37,18 +36,22 @@ jobs:
       run: |
         make build
   release:
-    name: Docker Push and Release
+    name: Docker Push and Github Release
     needs: docker_build
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'v')
     steps:
-    - name: Set env
-      run: echo ::set-env name=RELEASE_VERSION::${GITHUB_REF/refs\/tags\//}
+    - name: Checkout code
+      uses: actions/checkout@master
+    - name: Setup Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: 1.13.8
     - name: Docker Build and Push
+      if: github.event_name == 'push'
       run: |
+        export RELEASE_VERSION=${GITHUB_REF/refs\/tags\//}
+        export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
+        export PATH=${PATH}:`go env GOPATH`/bin
         docker login -u ${{ secrets.DOCKER_USER}} -p ${{ secrets.DOCKER_PASS}}  && \
         make push
-    - name: Performing a Github release
-      run: |
-        export GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
         make release
