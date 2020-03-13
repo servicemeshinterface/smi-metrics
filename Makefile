@@ -1,7 +1,6 @@
 ROOT_DIR := $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
 
 HAS_TILT := $(shell command -v tilt;)
-HAS_GOX := $(shell command -v gox;)
 HAS_GHR := $(shell command -v ghr;)
 HAS_HELM := $(shell command -v helm;)
 
@@ -18,11 +17,6 @@ endif
 
 .PHONY: release-bootstrap
 release-bootstrap:
-	@#Check for gox
-ifndef HAS_GOX
-	@echo "Installing gox"
-	go get -u github.com/mitchellh/gox
-endif
 	@#Check for ghr
 ifndef HAS_GHR
 	@echo "Installing ghr"
