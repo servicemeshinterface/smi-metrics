@@ -9,7 +9,6 @@ require (
 	github.com/eknkc/amber v0.0.0-20171010120322-cdade1c07385 // indirect
 	github.com/fsnotify/fsnotify v1.4.7
 	github.com/go-chi/chi v4.0.2+incompatible
-	github.com/google/uuid v1.1.1 // indirect
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0 // indirect
 	github.com/hellofresh/health-go v2.0.2+incompatible
 	github.com/huandu/xstrings v1.2.0 // indirect
@@ -21,16 +20,16 @@ require (
 	github.com/prometheus/common v0.3.0
 	github.com/sirupsen/logrus v1.4.1
 	github.com/spf13/cobra v0.0.3
-	github.com/spf13/pflag v1.0.3
+	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.3.2
-	github.com/stretchr/testify v1.3.0
+	github.com/stretchr/testify v1.4.0
 	github.com/unrolled/render v1.0.0
-	golang.org/x/crypto v0.0.0-20190426145343-a29dc8fdc734 // indirect
 	google.golang.org/grpc v1.20.1 // indirect
-	gopkg.in/yaml.v2 v2.2.2
-	k8s.io/api v0.0.0-20190409021203-6e4e0e4f393b
-	k8s.io/apimachinery v0.0.0-20190404173353-6a84e37a896d
-	k8s.io/client-go v11.0.0+incompatible
+	gopkg.in/yaml.v2 v2.2.4
+	k8s.io/api v0.17.2
+	k8s.io/apimachinery v0.17.2
+	k8s.io/client-go v0.17.2
 	k8s.io/klog v1.0.0
-	k8s.io/utils v0.0.0-20190506122338-8fab8cb257d5 // indirect
 )
+
+replace github.com/deislabs/smi-sdk-go => github.com/deislabs/smi-sdk-go v0.0.0-20200313173708-210bdedfca08

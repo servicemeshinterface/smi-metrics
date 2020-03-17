@@ -4,7 +4,7 @@ package mocks
 
 import context "context"
 import mesh "github.com/deislabs/smi-metrics/pkg/mesh"
-import metrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+import metrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 import mock "github.com/stretchr/testify/mock"
 import v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 

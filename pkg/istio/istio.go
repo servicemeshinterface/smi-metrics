@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/deislabs/smi-metrics/pkg/prometheus"
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	metrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	"github.com/prometheus/client_golang/api"
 	v1 "k8s.io/api/core/v1"
 )
@@ -104,7 +104,8 @@ func (l *Istio) GetResourceMetrics(ctx context.Context,
 		interval,
 		queries,
 		l.prometheusClient,
-		getResource)
+		getResource,
+		nil)
 	if err != nil {
 		return nil, err
 	}

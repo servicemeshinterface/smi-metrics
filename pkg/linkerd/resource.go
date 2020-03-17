@@ -20,3 +20,11 @@ func getResource(r *prometheus.ResourceLookup, labels model.Metric) *v1.ObjectRe
 		Name:      string(labels[labelName]),
 	}
 }
+
+func getRoute(r *prometheus.ResourceLookup, labels model.Metric) string {
+	route, ok := labels["rt_route"]
+	if !ok {
+		route = "[DEFAULT]"
+	}
+	return string(route)
+}

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	metrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	"github.com/masterminds/sprig"
 	promAPI "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"

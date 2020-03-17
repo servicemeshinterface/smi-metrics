@@ -5,7 +5,7 @@ import (
 	"fmt"
 
 	"github.com/deislabs/smi-metrics/pkg/mesh"
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	metrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	"github.com/go-chi/chi"
 	log "github.com/sirupsen/logrus"
 

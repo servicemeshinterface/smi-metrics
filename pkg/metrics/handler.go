@@ -5,9 +5,7 @@ import (
 
 	"github.com/deislabs/smi-metrics/pkg/mesh"
 
-	log "github.com/sirupsen/logrus"
-
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	metrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	"github.com/go-chi/chi"
 	"github.com/unrolled/render"
 )
@@ -81,18 +79,11 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(resourceMetrics.Items) != 1 {
-		for _, x := range resourceMetrics.Items {
-			log.Info(x.Resource)
-		}
-		log.Errorf("Wrong number of items: %d", len(resourceMetrics.Items))
-		h.jsonResponse(w, http.StatusInternalServerError, mesh.ErrorResponse{
-			Error: "unable to lookup metrics",
-		})
-		return
+	if len(resourceMetrics.Items) == 1 {
+		h.jsonResponse(w, http.StatusOK, resourceMetrics.Items[0])
+	} else {
+		h.jsonResponse(w, http.StatusOK, resourceMetrics)
 	}
-
-	h.jsonResponse(w, http.StatusOK, resourceMetrics.Items[0])
 }
 
 func (h *Handler) edges(w http.ResponseWriter, r *http.Request) {

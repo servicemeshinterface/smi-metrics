@@ -10,7 +10,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/deislabs/smi-metrics/pkg/prometheus"
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	metrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	"github.com/prometheus/client_golang/api"
 	v1 "k8s.io/api/core/v1"
 )
@@ -18,11 +18,12 @@ import (
 type Config struct {
 	PrometheusURL   string            `yaml:"prometheusUrl"`
 	ResourceQueries map[string]string `yaml:"resourceQueries"`
+	RouteResourceQueries map[string]string `yaml:"routeResourceQueries"`
 	EdgeQueries     map[string]string `yaml:"edgeQueries"`
 }
 
 type Linkerd struct {
-	queries          prometheus.Queries
+	queries          Config
 	prometheusClient promv1.API
 }
 
@@ -76,12 +77,23 @@ func (l *Linkerd) GetResourceMetrics(ctx context.Context,
 		obj.Name = query.Name
 	}
 
+	getRouteFn := getRoute
+	queries := l.queries.RouteResourceQueries
+	// Don't query for routes if listing resources.
+	if query.Name == "" {
+		getRouteFn = nil
+		queries = l.queries.ResourceQueries
+	}
+
+
+
 	metricsList, err := prometheus.GetResourceTrafficMetricsList(ctx,
 		obj,
 		interval,
-		l.queries.ResourceQueries,
+		queries,
 		l.prometheusClient,
-		getResource)
+		getResource,
+		getRouteFn)
 	if err != nil {
 		return nil, err
 	}
@@ -96,13 +108,8 @@ func NewLinkerdProvider(config Config) (*Linkerd, error) {
 		return nil, err
 	}
 
-	queries := prometheus.Queries{
-		ResourceQueries: config.ResourceQueries,
-		EdgeQueries:     config.EdgeQueries,
-	}
-
 	return &Linkerd{
-		queries:          queries,
+		queries:          config,
 		prometheusClient: promv1.NewAPI(promClient),
 	}, nil
 }

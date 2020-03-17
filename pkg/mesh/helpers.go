@@ -1,7 +1,7 @@
 package mesh
 
 import (
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	metrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	v1 "k8s.io/api/core/v1"
 )
 
