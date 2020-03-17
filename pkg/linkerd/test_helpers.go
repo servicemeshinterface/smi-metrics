@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"path"
 	"time"
-	"fmt"
+	"regexp"
 
 	"github.com/deislabs/smi-metrics/pkg/metrics"
 
@@ -75,12 +75,12 @@ type apiTest struct {
 }
 
 func (a *apiTest) MatchQueryParam() func(string) bool {
-	assert := a.Suite.Assert()
-
 	return func(query string) bool {
 		for _, snippet := range a.Snippets {
-			fmt.Printf("snippet: %s query %s", snippet, query)
-			assert.Regexp(snippet, query)
+			r := regexp.MustCompile(snippet)
+			if r.FindStringIndex(query) == nil {
+				return false
+			}
 		}
 
 		return true

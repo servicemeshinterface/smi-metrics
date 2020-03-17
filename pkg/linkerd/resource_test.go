@@ -167,7 +167,7 @@ func (s *ResourceTestSuite) TestGet() {
 						fmt.Sprintf("%s=~\"%s\"", lowerKind, sample.name),
 						fmt.Sprintf("namespace=~\"%s\"", sample.namespace),
 						"[30s]",
-						fmt.Sprintf(`by\s+\(\s+%s,\s+namespace`, lowerKind),
+						fmt.Sprintf(`by\s+\(\s+%s,(\s+rt_route,)?\s+namespace`, lowerKind),
 					},
 				}
 
