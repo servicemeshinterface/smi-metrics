@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path"
-	"time"
 	"regexp"
+	"time"
 
 	"github.com/deislabs/smi-metrics/pkg/metrics"
 

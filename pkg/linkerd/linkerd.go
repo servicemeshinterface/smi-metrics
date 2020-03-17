@@ -16,10 +16,10 @@ import (
 )
 
 type Config struct {
-	PrometheusURL   string            `yaml:"prometheusUrl"`
-	ResourceQueries map[string]string `yaml:"resourceQueries"`
+	PrometheusURL        string            `yaml:"prometheusUrl"`
+	ResourceQueries      map[string]string `yaml:"resourceQueries"`
 	RouteResourceQueries map[string]string `yaml:"routeResourceQueries"`
-	EdgeQueries     map[string]string `yaml:"edgeQueries"`
+	EdgeQueries          map[string]string `yaml:"edgeQueries"`
 }
 
 type Linkerd struct {
@@ -84,8 +84,6 @@ func (l *Linkerd) GetResourceMetrics(ctx context.Context,
 		getRouteFn = nil
 		queries = l.queries.ResourceQueries
 	}
-
-
 
 	metricsList, err := prometheus.GetResourceTrafficMetricsList(ctx,
 		obj,

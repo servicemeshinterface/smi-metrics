@@ -29,7 +29,7 @@ func GetResourceTrafficMetricsList(ctx context.Context,
 		interval,
 		queries,
 		getResource,
-	  getRoute)
+		getRoute)
 
 	if err := NewClient(ctx, client, interval).Update(
 		lookup); err != nil {

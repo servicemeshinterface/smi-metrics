@@ -16,7 +16,7 @@ type ResourceLookup struct {
 	interval    *metrics.Interval
 	queries     map[string]string
 	getResource getResourceFunc
-	getRoute getRouteFunc
+	getRoute    getRouteFunc
 }
 
 func newResourceLookup(item *metrics.TrafficMetricsList,
@@ -30,7 +30,7 @@ func newResourceLookup(item *metrics.TrafficMetricsList,
 		interval:    interval,
 		queries:     queries,
 		getResource: getResource,
-		getRoute: getRoute,
+		getRoute:    getRoute,
 	}
 }
 
