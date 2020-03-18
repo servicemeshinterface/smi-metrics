@@ -1,3 +1,7 @@
+# Community
+
+The smi-spec repo links to [SMI community resources](https://github.com/servicemeshinterface/smi-spec/blob/master/README.md#communications).
+
 # SMI Metrics API
 
 This repository is an implementation of the [Traffic Metrics Spec](https://github.com/deislabs/smi-spec/blob/master/traffic-metrics.md) which follows the format of the official [Metrics API](https://github.com/kubernetes-incubator/metrics-server) being built on top of kubernetes to get metrics about pods and nodes.
@@ -270,4 +274,4 @@ Output:
 
 ## Contributing
 
-Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more information on contributing to the specification.
+Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more information on contributing.
