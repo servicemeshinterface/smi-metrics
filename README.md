@@ -1,6 +1,10 @@
+# Community
+
+The smi-spec repo links to [SMI community resources](https://github.com/servicemeshinterface/smi-spec/blob/master/README.md#communications).
+
 # SMI Metrics API
 
-This repository is an implementation of the [Traffic Metrics Spec](https://github.com/deislabs/smi-spec/blob/master/traffic-metrics.md) which follows the format of the official [Metrics API](https://github.com/kubernetes-incubator/metrics-server) being built on top of kubernetes to get metrics about pods and nodes.
+This repository is an implementation of the [Traffic Metrics Spec](https://github.com/servicemeshinterface/smi-spec/blob/master/traffic-metrics.md) which follows the format of the official [Metrics API](https://github.com/kubernetes-incubator/metrics-server) being built on top of kubernetes to get metrics about pods and nodes.
 Here, the metrics are about the inbound and outbound requests i.e their Golden Metrics like p99_latency, p55_latency, success_count, etc for a particular workload.
 
 ## Installation
@@ -24,7 +28,7 @@ The support for  [Consul](https://learn.hashicorp.com/consul/) is being worked u
 
 ## Working
 
-The SMI metrics api is a Kubernetes [APIService](https://kubernetes.io/docs/tasks/access-kubernetes-api/setup-extension-api-server/) as seen in the [installation manifest](https://github.com/deislabs/smi-metrics/blob/master/chart/templates/apiservice.yaml#L5),
+The SMI metrics api is a Kubernetes [APIService](https://kubernetes.io/docs/tasks/access-kubernetes-api/setup-extension-api-server/) as seen in the [installation manifest](https://github.com/servicemeshinterface/smi-metrics/blob/master/chart/templates/apiservice.yaml#L5),
 which is a way of extending the Kubernetes API.
 
 We will perform installation of the SMI Metrics API w.r.t linkerd. Make sure linkerd is installed and is running as per the instructions [here](https://linkerd.io/2/getting-started/), This API can be installed by running the following command
@@ -270,4 +274,4 @@ Output:
 
 ## Contributing
 
-Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more information on contributing to the specification.
+Please refer to [CONTRIBUTING.md](./CONTRIBUTING.md) for more information on contributing.
