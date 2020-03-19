@@ -1,5 +1,9 @@
 # Contributing
 
+## Community
+
+The smi-spec repo links to [SMI community resources](https://github.com/servicemeshinterface/smi-spec/blob/master/README.md#communications).
+
 ## Project Governance
 
 Project maintainership is outlined in the [GOVERNANCE](GOVERNANCE.md) file.

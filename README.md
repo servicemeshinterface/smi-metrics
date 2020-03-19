@@ -1,7 +1,3 @@
-# Community
-
-The smi-spec repo links to [SMI community resources](https://github.com/servicemeshinterface/smi-spec/blob/master/README.md#communications).
-
 # SMI Metrics API
 
 This repository is an implementation of the [Traffic Metrics Spec](https://github.com/servicemeshinterface/smi-spec/blob/master/traffic-metrics.md) which follows the format of the official [Metrics API](https://github.com/kubernetes-incubator/metrics-server) being built on top of kubernetes to get metrics about pods and nodes.
