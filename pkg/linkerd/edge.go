@@ -6,7 +6,7 @@ import (
 
 	"github.com/prometheus/common/model"
 	"github.com/servicemeshinterface/smi-metrics/pkg/prometheus"
-	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
+	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	v1 "k8s.io/api/core/v1"
 )
 

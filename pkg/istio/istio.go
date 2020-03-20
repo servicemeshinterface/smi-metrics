@@ -7,7 +7,7 @@ import (
 	promv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/servicemeshinterface/smi-metrics/pkg/mesh"
 	"github.com/servicemeshinterface/smi-metrics/pkg/prometheus"
-	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
+	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
@@ -68,6 +68,7 @@ func (l *Istio) GetEdgeMetrics(ctx context.Context,
 		interval,
 		details,
 		queries,
+		nil,
 		l.prometheusClient,
 		getEdge)
 	if err != nil {
@@ -100,8 +101,10 @@ func (l *Istio) GetResourceMetrics(ctx context.Context,
 		obj,
 		interval,
 		queries,
+		nil,
 		l.prometheusClient,
-		getResource)
+		getResource,
+		nil)
 	if err != nil {
 		return nil, err
 	}

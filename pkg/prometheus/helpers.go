@@ -6,7 +6,7 @@ import (
 	promv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/log"
 	"github.com/servicemeshinterface/smi-metrics/pkg/mesh"
-	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
+	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	v1 "k8s.io/api/core/v1"
 )
 
@@ -19,15 +19,19 @@ func GetResourceTrafficMetricsList(ctx context.Context,
 	obj *v1.ObjectReference,
 	interval *metrics.Interval,
 	queries map[string]string,
+	values map[string]string,
 	client promv1.API,
-	getResource getResourceFunc) (*metrics.TrafficMetricsList, error) {
+	getResource getResourceFunc,
+	getBackend getBackendFunc) (*metrics.TrafficMetricsList, error) {
 	// Get is somewhat of a special case as *most* handlers just return a list.
 	// Create a list with a fully specified object reference and then just
 	// return a single element to keep the code as similar as possible.
 	lookup := newResourceLookup(metrics.NewTrafficMetricsList(obj, false),
 		interval,
 		queries,
-		getResource)
+		values,
+		getResource,
+		getBackend)
 
 	if err := NewClient(ctx, client, interval).Update(
 		lookup); err != nil {
@@ -42,6 +46,7 @@ func GetEdgeTraffifMetricsList(ctx context.Context,
 	interval *metrics.Interval,
 	details *mesh.ResourceDetails,
 	queries map[string]string,
+	values map[string]string,
 	client promv1.API,
 	getEdge getEdgeFunc) (*metrics.TrafficMetricsList, error) {
 

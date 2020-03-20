@@ -176,3 +176,73 @@ linkerd:
                 namespace,
                 dst_namespace
               )
+  trafficSplitQueries:
+    p99_response_latency : |-
+      histogram_quantile(
+                        0.99,
+                        sum(
+                          irate(
+                            response_latency_ms_bucket{
+                              authority=~"{{.apex}}\.{{.namespace}}\.svc\..+",
+                              direction="outbound"
+                            }[{{.window}}]
+                          )
+                        ) by (
+                          dst_service,
+                          le
+                        )
+                      )
+    p90_response_latency : |-
+      histogram_quantile(
+                        0.90,
+                        sum(
+                          irate(
+                            response_latency_ms_bucket{
+                              authority=~"{{.apex}}\.{{.namespace}}\.svc\..+",
+                              direction="outbound"
+                            }[{{.window}}]
+                          )
+                        ) by (
+                          dst_service,
+                          le
+                        )
+                      )
+    p50_response_latency : |-
+      histogram_quantile(
+                        0.50,
+                        sum(
+                          irate(
+                            response_latency_ms_bucket{
+                              authority=~"{{.apex}}\.{{.namespace}}\.svc\..+",
+                              direction="outbound"
+                            }[{{.window}}]
+                          )
+                        ) by (
+                          dst_service,
+                          le
+                        )
+                      )
+    success_count : |-
+      sum(
+                increase(
+                  response_total{
+                    classification="success",
+                    authority=~"{{.apex}}\.{{.namespace}}\.svc\..+",
+                    direction="outbound"
+                  }[{{.window}}]
+                )
+              ) by (
+                dst_service
+              )
+    failure_count : |-
+      sum(
+                increase(
+                  response_total{
+                    classification="failure",
+                    authority=~"{{.apex}}\.{{.namespace}}\.svc\..+",
+                    direction="outbound"
+                  }[{{.window}}]
+                )
+              ) by (
+                dst_service
+              )

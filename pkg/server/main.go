@@ -17,7 +17,7 @@ import (
 	"github.com/servicemeshinterface/smi-metrics/pkg/cluster"
 	"github.com/servicemeshinterface/smi-metrics/pkg/mesh"
 	"github.com/servicemeshinterface/smi-metrics/pkg/metrics"
-	metricsAPI "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
+	metricsAPI "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	log "github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )

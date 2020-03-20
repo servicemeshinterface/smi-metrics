@@ -8,7 +8,7 @@ import (
 	"testing"
 
 	"github.com/prometheus/common/model"
-	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
+	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"
 )

@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"math"
 	"text/template"
 
 	"github.com/masterminds/sprig"
 	promAPI "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
-	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
+	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	log "github.com/sirupsen/logrus"
 	apiresource "k8s.io/apimachinery/pkg/api/resource"
 )
@@ -95,6 +96,9 @@ func (c *Client) Update(lst Lookup) error {
 		}
 
 		for _, sample := range result {
+			if math.IsNaN(float64(sample.Value)) {
+				continue
+			}
 			resource := lst.Get(sample.Metric)
 			metric := resource.Get(query.Name)
 			if metric.Name == "" {
