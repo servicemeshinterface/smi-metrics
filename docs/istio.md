@@ -30,6 +30,6 @@ The labels required by SMI Metrics on the above metrics are:
 
 The first four labels are not present in the default metrics installation of Istio. So, For SMI to work with Istio, SMI needs separate metrics with labels that it requires.
 
-The manifests that add these required metrics can be found [here](https://github.com/deislabs/smi-metrics/tree/master/chart/templates/crds.yaml)
+The manifests that add these required metrics can be found [here](https://github.com/servicemeshinterface/smi-metrics/tree/master/chart/templates/crds.yaml)
 
 To verify if the labels are added correctly, prometheus metrics can be checked to see if those metrics have the configured labels.
