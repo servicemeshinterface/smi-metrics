@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  name: deislabs/smi-metrics:VERSION
+  name: servicemeshinterface/smi-metrics:VERSION
   pullPolicy: IfNotPresent
 
 config:

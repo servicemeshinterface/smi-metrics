@@ -4,7 +4,7 @@ HAS_TILT := $(shell command -v tilt;)
 HAS_GHR := $(shell command -v ghr;)
 
 
-IMAGE_NAME      ?= deislabs/smi-metrics
+IMAGE_NAME      ?= servicemeshinterface/smi-metrics
 
 GIT_COMMIT      ?= $(shell git rev-parse --short HEAD)
 ifdef RELEASE_VERSION
@@ -78,7 +78,7 @@ ifndef GITHUB_TOKEN
 	@echo "Requires a GITHUB_TOKEN with edit permissions for releases."
 	@exit 1
 endif
-	ghr -u deislabs \
+	ghr -u servicemeshinterface \
 		${RELEASE_VERSION} \
 		tmp/smi-metrics-*
 
