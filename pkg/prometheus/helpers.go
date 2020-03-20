@@ -3,10 +3,10 @@ package prometheus
 import (
 	"context"
 
-	"github.com/deislabs/smi-metrics/pkg/mesh"
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	promv1 "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/log"
+	"github.com/servicemeshinterface/smi-metrics/pkg/mesh"
+	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
 	v1 "k8s.io/api/core/v1"
 )
 

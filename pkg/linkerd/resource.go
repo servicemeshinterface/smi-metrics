@@ -3,11 +3,9 @@ package linkerd
 import (
 	"strings"
 
-	"github.com/deislabs/smi-metrics/pkg/prometheus"
-
-	v1 "k8s.io/api/core/v1"
-
 	"github.com/prometheus/common/model"
+	"github.com/servicemeshinterface/smi-metrics/pkg/prometheus"
+	v1 "k8s.io/api/core/v1"
 )
 
 // Takes an Prometheus result and gives back a kubernetes object reference

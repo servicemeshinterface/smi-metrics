@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"net/http"
 
-	metricsAPI "github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/hellofresh/health-go"
@@ -15,12 +14,12 @@ import (
 	http_metrics "github.com/improbable-eng/go-httpwares/metrics"
 	http_prometheus "github.com/improbable-eng/go-httpwares/metrics/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+	"github.com/servicemeshinterface/smi-metrics/pkg/cluster"
+	"github.com/servicemeshinterface/smi-metrics/pkg/mesh"
+	"github.com/servicemeshinterface/smi-metrics/pkg/metrics"
+	metricsAPI "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
 	log "github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-
-	"github.com/deislabs/smi-metrics/pkg/cluster"
-	"github.com/deislabs/smi-metrics/pkg/mesh"
-	"github.com/deislabs/smi-metrics/pkg/metrics"
 )
 
 // Server provides the HTTP serving functionality

@@ -1,10 +1,9 @@
 package prometheus
 
 import (
-	"github.com/deislabs/smi-metrics/pkg/mesh"
 	"github.com/prometheus/common/model"
-
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	"github.com/servicemeshinterface/smi-metrics/pkg/mesh"
+	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
 )
 
 type getEdgeFunc func(e *EdgeLookup, labels model.Metric) *metrics.Edge

@@ -7,9 +7,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/deislabs/smi-metrics/pkg/mesh"
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	"github.com/prometheus/common/model"
+	"github.com/servicemeshinterface/smi-metrics/pkg/mesh"
+	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
 	"github.com/stretchr/testify/suite"
 	v1 "k8s.io/api/core/v1"
 )

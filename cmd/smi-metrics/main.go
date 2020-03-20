@@ -5,19 +5,17 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/deislabs/smi-metrics/pkg/istio"
-
-	"github.com/deislabs/smi-metrics/pkg/linkerd"
-	"github.com/deislabs/smi-metrics/pkg/mesh"
 	"github.com/fsnotify/fsnotify"
+	"github.com/servicemeshinterface/smi-metrics/pkg/istio"
+	"github.com/servicemeshinterface/smi-metrics/pkg/linkerd"
+	"github.com/servicemeshinterface/smi-metrics/pkg/mesh"
+	"github.com/servicemeshinterface/smi-metrics/pkg/server"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 	"gopkg.in/yaml.v2"
 	"k8s.io/klog"
-
-	"github.com/deislabs/smi-metrics/pkg/server"
 )
 
 var (

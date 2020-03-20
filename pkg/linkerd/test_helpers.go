@@ -8,16 +8,14 @@ import (
 	"path"
 	"time"
 
-	"github.com/deislabs/smi-metrics/pkg/metrics"
-	"github.com/deislabs/smi-metrics/pkg/prometheus"
-
-	"gopkg.in/yaml.v2"
-
-	"github.com/deislabs/smi-metrics/pkg/linkerd/mocks"
-	smimetrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	"github.com/prometheus/common/model"
+	"github.com/servicemeshinterface/smi-metrics/pkg/linkerd/mocks"
+	"github.com/servicemeshinterface/smi-metrics/pkg/metrics"
+	"github.com/servicemeshinterface/smi-metrics/pkg/prometheus"
+	smimetrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
+	"gopkg.in/yaml.v2"
 	apiresource "k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
