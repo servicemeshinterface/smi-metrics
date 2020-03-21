@@ -5,6 +5,7 @@ linters:
     - prealloc
     - unparam
     - gochecknoglobals
+    - funlen
 
   skip-dirs:
     # ignore the system libraries
