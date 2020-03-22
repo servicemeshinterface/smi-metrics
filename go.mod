@@ -12,8 +12,8 @@ require (
 	github.com/improbable-eng/go-httpwares v0.0.0-20191126155631-6144c42a79c9
 	github.com/masterminds/sprig v2.22.0+incompatible
 	github.com/mitchellh/copystructure v1.0.0 // indirect
-	github.com/prometheus/client_golang v1.5.1
-	github.com/prometheus/common v0.9.1
+	github.com/prometheus/client_golang v0.9.3
+	github.com/prometheus/common v0.4.0
 	github.com/servicemeshinterface/smi-sdk-go v0.3.0
 	github.com/sirupsen/logrus v1.4.2
 	github.com/spf13/cobra v0.0.6

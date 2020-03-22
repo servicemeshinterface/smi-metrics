@@ -73,7 +73,7 @@ func (c *Client) Execute(
 		"query": query,
 	}).Debug("querying prometheus")
 
-	result, _, err := c.client.Query(c.ctx, query, c.interval.Timestamp.Time)
+	result, err := c.client.Query(c.ctx, query, c.interval.Timestamp.Time)
 	if err != nil {
 		return nil, err
 	}
