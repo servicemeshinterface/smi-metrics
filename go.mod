@@ -1,6 +1,6 @@
 module github.com/servicemeshinterface/smi-metrics
 
-go 1.14
+go 1.12
 
 require (
 	github.com/Masterminds/goutils v1.1.0 // indirect
