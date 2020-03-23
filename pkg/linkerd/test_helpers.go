@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path"
+	"regexp"
 	"time"
 
 	"github.com/prometheus/common/model"
@@ -73,13 +74,14 @@ type apiTest struct {
 }
 
 func (a *apiTest) MatchQueryParam() func(string) bool {
-	assert := a.Suite.Assert()
 
 	return func(query string) bool {
 		for _, snippet := range a.Snippets {
-			assert.Regexp(snippet, query)
+			rx, _ := regexp.Compile(snippet)
+			if !rx.Match([]byte(query)) {
+				return false
+			}
 		}
-
 		return true
 	}
 }
