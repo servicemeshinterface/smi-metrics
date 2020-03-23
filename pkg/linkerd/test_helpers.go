@@ -111,7 +111,7 @@ func (a *apiTest) MockQuery(
 		"Query",
 		mock.Anything,
 		mock.MatchedBy(a.MatchQueryParam()),
-		mock.Anything).Return(result, nil).Times(num)
+		mock.Anything).Return(result, nil, nil).Times(num)
 
 	return val, interval
 }
