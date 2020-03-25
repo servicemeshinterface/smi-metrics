@@ -3,7 +3,7 @@ package mesh
 import (
 	"context"
 
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	metrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 

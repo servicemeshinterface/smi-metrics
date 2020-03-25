@@ -81,6 +81,91 @@ linkerd:
                 {{lower .kind}},
                 namespace
               )
+  routeResourceQueries:
+    p99_response_latency : |-
+      histogram_quantile(
+                        0.99,
+                        sum(
+                          irate(
+                            route_response_latency_ms_bucket{
+                              namespace=~"{{default ".+" .namespace }}",
+                              {{lower .kind}}=~"{{default ".+" .name }}",
+                              direction="inbound"
+                            }[{{.window}}]
+                          )
+                        ) by (
+                          {{lower .kind}},
+                          namespace,
+                          rt_route,
+                          le
+                        )
+                      )
+    p90_response_latency : |-
+      histogram_quantile(
+                        0.90,
+                        sum(
+                          irate(
+                            route_response_latency_ms_bucket{
+                              namespace=~"{{default ".+" .namespace }}",
+                              {{lower .kind}}=~"{{default ".+" .name }}",
+                              direction="inbound"
+                            }[{{.window}}]
+                          )
+                        ) by (
+                          {{lower .kind}},
+                          namespace,
+                          rt_route,
+                          le
+                        )
+                      )
+    p50_response_latency : |-
+      histogram_quantile(
+                        0.50,
+                        sum(
+                          irate(
+                            route_response_latency_ms_bucket{
+                              namespace=~"{{default ".+" .namespace }}",
+                              {{lower .kind}}=~"{{default ".+" .name }}",
+                              direction="inbound"
+                            }[{{.window}}]
+                          )
+                        ) by (
+                          {{lower .kind}},
+                          namespace,
+                          rt_route,
+                          le
+                        )
+                      )
+    success_count : |-
+      sum(
+                increase(
+                  route_response_total{
+                    classification="success",
+                    namespace=~"{{default ".+" .namespace }}",
+                    {{lower .kind}}=~"{{default ".+" .name }}",
+                    direction="inbound"
+                  }[{{.window}}]
+                )
+              ) by (
+                {{lower .kind}},
+                namespace,
+                rt_route
+              )
+    failure_count : |-
+      sum(
+                increase(
+                  route_response_total{
+                    classification="failure",
+                    namespace=~"{{default ".+" .namespace }}",
+                    {{lower .kind}}=~"{{default ".+" .name }}",
+                    direction="inbound"
+                  }[{{.window}}]
+                )
+              ) by (
+                {{lower .kind}},
+                namespace,
+                rt_route
+              )
   edgeQueries:
     p99_response_latency : |-
       histogram_quantile(

@@ -4,7 +4,7 @@ import (
 	"github.com/deislabs/smi-metrics/pkg/prometheus"
 	"github.com/prometheus/common/log"
 
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	metrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	"github.com/prometheus/common/model"
 	v1 "k8s.io/api/core/v1"
 )

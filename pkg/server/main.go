@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	metricsAPI "github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	metricsAPI "github.com/deislabs/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/hellofresh/health-go"

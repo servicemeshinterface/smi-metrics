@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	metrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	"github.com/prometheus/common/model"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/suite"

@@ -6,15 +6,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"path"
+	"regexp"
 	"time"
 
 	"github.com/deislabs/smi-metrics/pkg/metrics"
-	"github.com/deislabs/smi-metrics/pkg/prometheus"
 
 	"gopkg.in/yaml.v2"
 
 	"github.com/deislabs/smi-metrics/pkg/linkerd/mocks"
-	smimetrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
+	smimetrics "github.com/deislabs/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	"github.com/prometheus/common/model"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
@@ -75,11 +75,12 @@ type apiTest struct {
 }
 
 func (a *apiTest) MatchQueryParam() func(string) bool {
-	assert := a.Suite.Assert()
-
 	return func(query string) bool {
 		for _, snippet := range a.Snippets {
-			assert.Regexp(snippet, query)
+			r := regexp.MustCompile(snippet)
+			if r.FindStringIndex(query) == nil {
+				return false
+			}
 		}
 
 		return true
@@ -208,15 +209,11 @@ func (s *Suite) SetupTest() {
 	file, err := ioutil.ReadFile("test_queries.yaml")
 	s.Require().NoError(err)
 
-	var queries prometheus.Queries
-	err = yaml.Unmarshal(file, &queries)
+	var config Config
+	err = yaml.Unmarshal(file, &config)
 	s.Require().NoError(err)
 
-	config := Config{
-		"http://stub:9090",
-		queries.ResourceQueries,
-		queries.EdgeQueries,
-	}
+	config.PrometheusURL = "http://stub:9090"
 
 	linkerdMesh, err := NewLinkerdProvider(config)
 	s.Require().NoError(err)
