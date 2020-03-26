@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/deislabs/smi-sdk-go/pkg/apis/metrics"
 	"github.com/masterminds/sprig"
 	promAPI "github.com/prometheus/client_golang/api/prometheus/v1"
 	"github.com/prometheus/common/model"
+	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
 	log "github.com/sirupsen/logrus"
 	apiresource "k8s.io/apimachinery/pkg/api/resource"
 )
@@ -73,7 +73,7 @@ func (c *Client) Execute(
 		"query": query,
 	}).Debug("querying prometheus")
 
-	result, err := c.client.Query(c.ctx, query, c.interval.Timestamp.Time)
+	result, _, err := c.client.Query(c.ctx, query, c.interval.Timestamp.Time)
 	if err != nil {
 		return nil, err
 	}

@@ -5,11 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	v1 "k8s.io/api/core/v1"
-
 	"github.com/prometheus/common/log"
-
 	"github.com/prometheus/common/model"
+	v1 "k8s.io/api/core/v1"
 )
 
 var (
