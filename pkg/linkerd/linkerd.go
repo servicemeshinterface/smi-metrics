@@ -16,6 +16,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+const trafficsplitKind = "Trafficsplit"
+
 type Config struct {
 	PrometheusURL       string            `yaml:"prometheusUrl"`
 	ResourceQueries     map[string]string `yaml:"resourceQueries"`
@@ -85,7 +87,7 @@ func (l *Linkerd) GetResourceMetrics(ctx context.Context,
 
 	var getBackend func(r *prometheus.ResourceLookup, labels model.Metric) *metrics.Backend
 
-	if query.Kind == "Trafficsplit" {
+	if query.Kind == trafficsplitKind {
 
 		ts, err := l.getTrafficSplit(query)
 		if err != nil {

@@ -21,7 +21,7 @@ type ResourceLookup struct {
 
 func newResourceLookup(item *metrics.TrafficMetricsList,
 	interval *metrics.Interval,
-	queries map[string]string,
+	queries,
 	values map[string]string,
 	getResource getResourceFunc,
 	getBackend getBackendFunc) *ResourceLookup {

@@ -10,7 +10,7 @@ import (
 
 // Takes an Prometheus result and gives back a kubernetes object reference
 func getResource(r *prometheus.ResourceLookup, labels model.Metric) *v1.ObjectReference {
-	if r.Item.Resource.Kind == "Trafficsplit" {
+	if r.Item.Resource.Kind == trafficsplitKind {
 		return r.Item.Resource
 	}
 
