@@ -55,3 +55,10 @@ jobs:
         docker login -u ${{ secrets.DOCKER_USER}} -p ${{ secrets.DOCKER_PASS}}  && \
         make push
         make release
+    - name: Publish Helm chart
+      uses: stefanprodan/helm-gh-pages@master
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        charts_dir: chart
+        branch: gh-pages
+        
