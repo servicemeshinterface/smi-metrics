@@ -1,0 +1,338 @@
+mesh: openservicemesh
+openservicemesh:
+  prometheusUrl: http://osm-prometheus.osm-system.svc.cluster.local:7070
+  resourceQueries:
+    p99_response_latency: |-
+      histogram_quantile(
+        0.99,
+        sum(
+          irate(
+            osm_request_duration_ms_bucket {
+            {{ $name := replace "-" "_" .name | replace "." "_" }}
+            {{ $namespace := replace "-" "_" .namespace }}
+            {{- if eq .kind "Namespace" }}
+              destination_namespace=~"{{ default ".+" $name }}",
+            {{- else }}
+              {{- if eq .kind "Pod" }}
+                destination_pod=~"{{ default ".+" $name }}",
+              {{- else }}
+                destination_name=~"{{ default ".+" $name }}",
+                destination_kind=~"{{ default ".+" .kind }}",
+              {{- end }}
+              destination_namespace=~"{{ default ".+" $namespace }}"
+            {{- end }}
+            }[{{.window}}]
+          )
+        ) by (
+          destination_name,
+          destination_namespace,
+          destination_kind,
+          destination_pod,
+          le
+        )
+      )
+    p90_response_latency: |-
+      histogram_quantile(
+        0.90,
+        sum(
+          irate(
+            osm_request_duration_ms_bucket {
+            {{ $name := replace "-" "_" .name | replace "." "_" }}
+            {{ $namespace := replace "-" "_" .namespace }}
+            {{- if eq .kind "Namespace" }}
+              destination_namespace=~"{{ default ".+" $name }}",
+            {{- else }}
+              {{- if eq .kind "Pod" }}
+                destination_pod=~"{{ default ".+" $name }}",
+              {{- else }}
+                destination_name=~"{{ default ".+" $name }}",
+                destination_kind=~"{{ default ".+" .kind }}",
+              {{- end }}
+              destination_namespace=~"{{ default ".+" $namespace }}"
+            {{- end }}
+            }[{{.window}}]
+          )
+        ) by (
+          destination_name,
+          destination_namespace,
+          destination_kind,
+          destination_pod,
+          le
+        )
+      )
+    p50_response_latency: |-
+      histogram_quantile(
+        0.50,
+        sum(
+          irate(
+            osm_request_duration_ms_bucket {
+            {{ $name := replace "-" "_" .name | replace "." "_" }}
+            {{ $namespace := replace "-" "_" .namespace }}
+            {{- if eq .kind "Namespace" }}
+              destination_namespace=~"{{ default ".+" $name }}",
+            {{- else }}
+              {{- if eq .kind "Pod" }}
+                destination_pod=~"{{ default ".+" $name }}",
+              {{- else }}
+                destination_name=~"{{ default ".+" $name }}",
+                destination_kind=~"{{ default ".+" .kind }}",
+              {{- end }}
+              destination_namespace=~"{{ default ".+" $namespace }}"
+            {{- end }}
+            }[{{.window}}]
+          )
+        ) by (
+          destination_name,
+          destination_namespace,
+          destination_kind,
+          destination_pod,
+          le
+        )
+      )
+    success_count: |-
+      sum(
+        increase(
+          osm_request_total{
+            response_code=~"2..",
+            {{ $name := replace "-" "_" .name | replace "." "_" }}
+            {{ $namespace := replace "-" "_" .namespace }}
+            {{- if eq .kind "Namespace" }}
+              destination_namespace=~"{{ default ".+" $name }}",
+            {{- else }}
+              {{- if eq .kind "Pod" }}
+                destination_pod=~"{{ default ".+" $name }}",
+              {{- else }}
+                destination_name=~"{{ default ".+" $name }}",
+                destination_kind=~"{{ default ".+" .kind }}",
+              {{- end }}
+              destination_namespace=~"{{ default ".+" $namespace }}"
+            {{- end }}
+          }[{{.window}}]
+        )
+      ) by (
+        destination_name,
+        destination_namespace,
+        destination_kind,
+        destination_pod
+      )
+    failure_count: |-
+      sum(
+        increase(
+          osm_request_total{
+            response_code!~"2..",
+            {{ $name := replace "-" "_" .name | replace "." "_" }}
+            {{ $namespace := replace "-" "_" .namespace }}
+            {{- if eq .kind "Namespace" }}
+              destination_namespace=~"{{ default ".+" $name }}",
+            {{- else }}
+              {{- if eq .kind "Pod" }}
+                destination_pod=~"{{ default ".+" $name }}",
+              {{- else }}
+                destination_name=~"{{ default ".+" $name }}",
+                destination_kind=~"{{ default ".+" .kind }}",
+              {{- end }}
+              destination_namespace=~"{{ default ".+" $namespace }}"
+            {{- end }}
+          }[{{.window}}]
+        )
+      ) by (
+        destination_name,
+        destination_namespace,
+        destination_kind,
+        destination_pod
+      )
+  edgeQueries:
+    p99_response_latency: |-
+      histogram_quantile(
+        0.99,
+        sum(
+          irate(
+            osm_request_duration_ms_bucket {
+            {{ $toName      := replace "-" "_" (default "" .toName)      | replace "." "_" }}
+            {{ $fromName    := replace "-" "_" (default "" .fromName)    | replace "." "_" }}
+            {{ $toNamespace := replace "-" "_" (default "" .toNamespace) }}
+            {{ $namespace   := replace "-" "_" (default "" .namespace) }}
+            {{- if eq .kind "Namespace" }}
+              destination_namespace=~"{{ default ".+" $toName }}",
+              source_namespace=~"{{ default ".+" $fromName }}"
+            {{- else }}
+              {{- if eq .kind "Pod" }}
+                destination_pod=~"{{ default ".+" $toName }}",
+                source_pod=~"{{ default ".+" $fromName }}",
+              {{- else }}
+                destination_name=~"{{ default ".+" $toName }}",
+                source_name=~"{{ default ".+" $fromName }}",
+                destination_kind=~"{{ default ".+" .kind }}",
+                source_kind=~"{{ default ".+" .kind }}",
+              {{- end }}
+              destination_namespace=~"{{ default ".+" $toNamespace }}",
+              source_namespace=~"{{ default ".+" $namespace }}"
+            {{- end }}
+            }[{{.window}}]
+          )
+        ) by (
+          destination_name,
+          destination_namespace,
+          destination_kind,
+          destination_pod,
+          source_name,
+          source_namespace,
+          source_kind,
+          source_pod,
+          le
+        )
+      )
+    p90_response_latency: |-
+      histogram_quantile(
+        0.90,
+        sum(
+          irate(
+            osm_request_duration_ms_bucket {
+            {{ $toName      := replace "-" "_" (default "" .toName)      | replace "." "_" }}
+            {{ $fromName    := replace "-" "_" (default "" .fromName)    | replace "." "_" }}
+            {{ $toNamespace := replace "-" "_" (default "" .toNamespace) }}
+            {{ $namespace   := replace "-" "_" (default "" .namespace) }}
+            {{- if eq .kind "Namespace" }}
+              destination_namespace=~"{{ default ".+" $toName }}",
+              source_namespace=~"{{ default ".+" $fromName }}"
+            {{- else }}
+              {{- if eq .kind "Pod" }}
+                destination_pod=~"{{ default ".+" $toName }}",
+                source_pod=~"{{ default ".+" $fromName }}",
+              {{- else }}
+                destination_name=~"{{ default ".+" $toName }}",
+                source_name=~"{{ default ".+" $fromName }}",
+                destination_kind=~"{{ default ".+" .kind }}",
+                source_kind=~"{{ default ".+" .kind }}",
+              {{- end }}
+              destination_namespace=~"{{ default ".+" $toNamespace }}",
+              source_namespace=~"{{ default ".+" $namespace }}"
+            {{- end }}
+            }[{{.window}}]
+          )
+        ) by (
+          destination_name,
+          destination_namespace,
+          destination_kind,
+          destination_pod,
+          source_name,
+          source_namespace,
+          source_kind,
+          source_pod,
+          le
+        )
+      )
+    p50_response_latency: |-
+      histogram_quantile(
+        0.50,
+        sum(
+          irate(
+            osm_request_duration_ms_bucket {
+            {{ $toName      := replace "-" "_" (default "" .toName)      | replace "." "_" }}
+            {{ $fromName    := replace "-" "_" (default "" .fromName)    | replace "." "_" }}
+            {{ $toNamespace := replace "-" "_" (default "" .toNamespace) }}
+            {{ $namespace   := replace "-" "_" (default "" .namespace) }}
+            {{- if eq .kind "Namespace" }}
+              destination_namespace=~"{{ default ".+" $toName }}",
+              source_namespace=~"{{ default ".+" $fromName }}"
+            {{- else }}
+              {{- if eq .kind "Pod" }}
+                destination_pod=~"{{ default ".+" $toName }}",
+                source_pod=~"{{ default ".+" $fromName }}",
+              {{- else }}
+                destination_name=~"{{ default ".+" $toName }}",
+                source_name=~"{{ default ".+" $fromName }}",
+                destination_kind=~"{{ default ".+" .kind }}",
+                source_kind=~"{{ default ".+" .kind }}",
+              {{- end }}
+              destination_namespace=~"{{ default ".+" $toNamespace }}",
+              source_namespace=~"{{ default ".+" $namespace }}"
+            {{- end }}
+            }[{{.window}}]
+          )
+        ) by (
+          destination_name,
+          destination_namespace,
+          destination_kind,
+          destination_pod,
+          source_name,
+          source_namespace,
+          source_kind,
+          source_pod,
+          le
+        )
+      )
+    success_count: |-
+      sum(
+        increase(
+          osm_request_total{
+            response_code=~"2..",
+            {{ $toName      := replace "-" "_" (default "" .toName)      | replace "." "_" }}
+            {{ $fromName    := replace "-" "_" (default "" .fromName)    | replace "." "_" }}
+            {{ $toNamespace := replace "-" "_" (default "" .toNamespace) }}
+            {{ $namespace   := replace "-" "_" (default "" .namespace) }}
+            {{- if eq .kind "Namespace" }}
+              destination_namespace=~"{{ default ".+" $toName }}",
+              source_namespace=~"{{ default ".+" $fromName }}"
+            {{- else }}
+              {{- if eq .kind "Pod" }}
+                destination_pod=~"{{ default ".+" $toName }}",
+                source_pod=~"{{ default ".+" $fromName }}",
+              {{- else }}
+                destination_name=~"{{ default ".+" $toName }}",
+                source_name=~"{{ default ".+" $fromName }}",
+                destination_kind=~"{{ default ".+" .kind }}",
+                source_kind=~"{{ default ".+" .kind }}",
+              {{- end }}
+              destination_namespace=~"{{ default ".+" $toNamespace }}",
+              source_namespace=~"{{ default ".+" $namespace }}"
+            {{- end }}
+          }[{{.window}}]
+        )
+      ) by (
+        destination_name,
+        destination_namespace,
+        destination_kind,
+        destination_pod,
+        source_name,
+        source_namespace,
+        source_kind,
+        source_pod
+      )
+    failure_count: |-
+      sum(
+        increase(
+          osm_request_total{
+            response_code!~"2..",
+            {{ $toName      := replace "-" "_" (default "" .toName)      | replace "." "_" }}
+            {{ $fromName    := replace "-" "_" (default "" .fromName)    | replace "." "_" }}
+            {{ $toNamespace := replace "-" "_" (default "" .toNamespace) }}
+            {{ $namespace   := replace "-" "_" (default "" .namespace) }}
+            {{- if eq .kind "Namespace" }}
+              destination_namespace=~"{{ default ".+" $toName }}",
+              source_namespace=~"{{ default ".+" $fromName }}"
+            {{- else }}
+              {{- if eq .kind "Pod" }}
+                destination_pod=~"{{ default ".+" $toName }}",
+                source_pod=~"{{ default ".+" $fromName }}",
+              {{- else }}
+                destination_name=~"{{ default ".+" $toName }}",
+                source_name=~"{{ default ".+" $fromName }}",
+                destination_kind=~"{{ default ".+" .kind }}",
+                source_kind=~"{{ default ".+" .kind }}",
+              {{- end }}
+              destination_namespace=~"{{ default ".+" $toNamespace }}",
+              source_namespace=~"{{ default ".+" $namespace }}"
+            {{- end }}
+          }[{{.window}}]
+        )
+      ) by (
+        destination_name,
+        destination_namespace,
+        destination_kind,
+        destination_pod,
+        source_name,
+        source_namespace,
+        source_kind,
+        source_pod
+      )

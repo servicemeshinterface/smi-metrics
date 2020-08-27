@@ -9,6 +9,7 @@ import (
 	"github.com/servicemeshinterface/smi-metrics/pkg/istio"
 	"github.com/servicemeshinterface/smi-metrics/pkg/linkerd"
 	"github.com/servicemeshinterface/smi-metrics/pkg/mesh"
+	"github.com/servicemeshinterface/smi-metrics/pkg/openservicemesh"
 	"github.com/servicemeshinterface/smi-metrics/pkg/server"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -226,6 +227,16 @@ func run(_ *cobra.Command, args []string) {
 		meshInstance, err = istio.NewIstioProvider(config)
 		if err != nil {
 			log.Fatal("Couldn't create a Istio instance", err)
+		}
+	case "openservicemesh":
+		var config openservicemesh.Config
+		err = viper.UnmarshalKey("openservicemesh", &config)
+		if err != nil {
+			log.Fatalf("Unable to unmarshal config into struct")
+		}
+		meshInstance, err = openservicemesh.NewOpenServiceMeshProvider(config)
+		if err != nil {
+			log.Fatal("Couldn't create an OpenServiceMesh instance", err)
 		}
 	default:
 		log.Fatalf("Unable to recognize the mesh type")

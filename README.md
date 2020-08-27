@@ -17,9 +17,15 @@ For Istio
 helm template chart --set adapter=istio | kubectl apply -f -
 ```
 
+For Open Service Mesh:
+
+```bash
+helm template chart --set adapter=openservicemesh | kubectl apply -f -
+```
+
 ## Roadmap
 
-The API supports [linkerd](https://linkerd.io/)  and [Istio](https://istio.io/) right now.
+The API supports [linkerd](https://linkerd.io/), [Istio](https://istio.io/), and [Open Service Mesh](https://openservicemesh.io) right now.
 The support for  [Consul](https://learn.hashicorp.com/consul/) is being worked up on right now and the API and responses will have the same structure unless there are no changes to the spec.
 
 ## Working
