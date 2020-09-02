@@ -46,6 +46,9 @@ jobs:
       uses: actions/setup-go@v1
       with:
         go-version: 1.14
+    - name: Build Chart
+      run: |
+        make build-chart
     - name: Docker Build and Push
       if: github.event_name == 'push'
       run: |
@@ -59,6 +62,6 @@ jobs:
       uses: stefanprodan/helm-gh-pages@master
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        charts_dir: charts/smi-metrics
+        charts_dir: tmp/smi-metrics
         branch: gh-pages
         

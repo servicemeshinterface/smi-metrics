@@ -56,13 +56,12 @@ ifndef RELEASE_VERSION
 	@echo "Missing RELEASE_VERSION, is this being run from CI?"
 	@exit 1
 endif
-	cp -R chart tmp/smi-metrics
+	cp -R chart/smi-metrics tmp/smi-metrics
 	sed -i.bak 's/CHART_VERSION/${VERSION}/g' tmp/smi-metrics/Chart.yaml
 	for fname in $$(grep -rnl '$*' tmp/smi-metrics); do \
 		sed -i.bak 's/VERSION/${RELEASE_VERSION}/g' $$fname; \
 	done
 	helm package tmp/smi-metrics -d tmp --save=false
-	rm -rf tmp/smi-metrics/
 
 .PHONY: dev
 dev: bootstrap
