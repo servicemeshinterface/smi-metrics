@@ -30,7 +30,8 @@ which is a way of extending the Kubernetes API.
 We will perform installation of the SMI Metrics API w.r.t linkerd. Make sure linkerd is installed and is running as per the instructions [here](https://linkerd.io/2/getting-started/), This API can be installed by running the following command
 
 ```bash
-helm template chart -f dev.yaml -f linkerd.yaml --name dev | kubectl apply -f -
+helm repo add smi https://servicemeshinterface.github.io/smi-metrics
+helm install smi-metrics smi/smi-metrics --set adapter=linkerd
 ```
 
 The installation of the APIService can be verified by running
