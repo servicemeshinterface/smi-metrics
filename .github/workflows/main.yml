@@ -56,9 +56,10 @@ jobs:
         make push
         make release
     - name: Publish Helm chart
+      if: github.event_name == 'push'
       uses: stefanprodan/helm-gh-pages@master
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        charts_dir: charts/smi-metrics
+        charts_dir: chart
         branch: gh-pages
         
