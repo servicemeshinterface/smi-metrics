@@ -1,6 +1,6 @@
 {{- $cn :=  list (include "smi-metrics.fullname" .) .Release.Namespace "svc" | join "." -}}
-{{- $ca := genSelfSignedCert $cn (list) (list $cn) 365 }}
-{{- $cert := genSignedCert $cn nil nil 365 $ca -}}
+{{- $ca := genSelfSignedCert $cn (list) (list $cn) 365 -}}
+{{- $cert := genSignedCert $cn nil (list $cn) 365 $ca -}}
 apiVersion: apiregistration.k8s.io/v1beta1
 kind: APIService
 metadata:
