@@ -4,10 +4,10 @@ image:
   name: servicemeshinterface/smi-metrics:VERSION
   pullPolicy: IfNotPresent
 
-config:
-  # log-level: info
-  # api-port: 8080
-  # admin-port: 8081
-  # tls-cert-file: /var/run/smi-metrics/tls.crt
-  # tls-private-key: /var/run/smi-metrics/tls.key
+# config:
+#   log-level: info
+#   api-port: 8080
+#   admin-port: 8081
+#   tls-cert-file: /var/run/smi-metrics/tls.crt
+#   tls-private-key: /var/run/smi-metrics/tls.key
 resources: {}
