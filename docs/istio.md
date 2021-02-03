@@ -9,7 +9,8 @@ The following steps require Istio to be installed along with mixer as it generat
 As Istio allows metrics to be configurable, SMI with Istio can be installed by directly running
 
 ```bash
-helm template chart --set adapter=istio | k apply -f -
+helm repo add smi https://servicemeshinterface.github.io/smi-metrics
+helm install smi-metrics smi/smi-metrics --set adapter=istio
 ```
 This installs the necessary instances, handlers and rules for Istio to emit those metrics along with SMI-Metrics APIServer.
 
