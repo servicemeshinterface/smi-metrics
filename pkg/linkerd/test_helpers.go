@@ -13,7 +13,7 @@ import (
 	"github.com/servicemeshinterface/smi-metrics/pkg/linkerd/mocks"
 	"github.com/servicemeshinterface/smi-metrics/pkg/metrics"
 	"github.com/servicemeshinterface/smi-metrics/pkg/prometheus"
-	smimetrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
+	smimetrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 	"gopkg.in/yaml.v2"
@@ -216,6 +216,7 @@ func (s *Suite) SetupTest() {
 		"http://stub:9090",
 		queries.ResourceQueries,
 		queries.EdgeQueries,
+		nil,
 	}
 
 	linkerdMesh, err := NewLinkerdProvider(config)

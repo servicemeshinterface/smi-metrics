@@ -5,6 +5,7 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -13,16 +14,7 @@ import (
 func GetClient() (*kubernetes.Clientset, error) {
 	log.Debug("initializing kubernetes client")
 
-	rules := clientcmd.NewDefaultClientConfigLoadingRules()
-	rules.DefaultClientConfig = &clientcmd.DefaultClientConfig
-
-	overrides := &clientcmd.ConfigOverrides{}
-
-	clientLoader := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
-		rules,
-		overrides)
-
-	config, err := clientLoader.ClientConfig()
+	config, err := GetKubeconfig()
 	if err != nil {
 		return nil, fmt.Errorf(
 			"could not get cluster config: %s", err)
@@ -38,4 +30,17 @@ func GetClient() (*kubernetes.Clientset, error) {
 	}).Debug("kubernetes client created")
 
 	return client, nil
+}
+
+func GetKubeconfig() (*rest.Config, error) {
+	rules := clientcmd.NewDefaultClientConfigLoadingRules()
+	rules.DefaultClientConfig = &clientcmd.DefaultClientConfig
+
+	overrides := &clientcmd.ConfigOverrides{}
+
+	clientLoader := clientcmd.NewNonInteractiveDeferredLoadingClientConfig(
+		rules,
+		overrides)
+
+	return clientLoader.ClientConfig()
 }

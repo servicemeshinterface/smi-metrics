@@ -5,8 +5,7 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/servicemeshinterface/smi-metrics/pkg/mesh"
-	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha1"
-	log "github.com/sirupsen/logrus"
+	metrics "github.com/servicemeshinterface/smi-sdk-go/pkg/apis/metrics/v1alpha2"
 	"github.com/unrolled/render"
 )
 
@@ -79,18 +78,12 @@ func (h *Handler) get(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if len(resourceMetrics.Items) != 1 {
-		for _, x := range resourceMetrics.Items {
-			log.Info(x.Resource)
-		}
-		log.Errorf("Wrong number of items: %d", len(resourceMetrics.Items))
-		h.jsonResponse(w, http.StatusInternalServerError, mesh.ErrorResponse{
-			Error: "unable to lookup metrics",
-		})
+	if len(resourceMetrics.Items) == 1 {
+		h.jsonResponse(w, http.StatusOK, resourceMetrics.Items[0])
 		return
 	}
 
-	h.jsonResponse(w, http.StatusOK, resourceMetrics.Items[0])
+	h.jsonResponse(w, http.StatusOK, resourceMetrics)
 }
 
 func (h *Handler) edges(w http.ResponseWriter, r *http.Request) {
